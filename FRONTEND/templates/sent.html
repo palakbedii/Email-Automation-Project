@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Sent Emails
+{% endblock %}
+
+{% block content %}
+
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Sent Emails</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+                  <li class="breadcrumb-item"><a href="#">Mailbox</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Sent Emails</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="app-content">
+          <div class="container-fluid">
+            <div class="card">
+
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Sent Emails
+                    </h3>
+                </div>
+
+                <div class="card-body">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Recipient</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>olive@gmail.com</td>
+                                <td>Interview Invitation</td>
+                                <td>14-07-2026</td>
+                                <td>10:30 AM</td>
+                                <td>
+                                    <span class="badge bg-warning">Sent</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>2</td>
+                                <td>hr@google.com</td>
+                                <td>Offer Letter</td>
+                                <td>15-07-2026</td>
+                                <td>09:00 AM</td>
+                                <td>
+                                    <span class="badge bg-warning">Sent</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>3</td>
+                                <td>olive@gmail.com</td>
+                                <td>Interview Invitation</td>
+                                <td>14-07-2026</td>
+                                <td>10:30 AM</td>
+                                <td><span class="badge bg-warning">Sent</span></td>
+                            </tr>
+
+                            <tr>
+                                <td>4</td>
+                                <td>hr@microsoft.com</td>
+                                <td>Offer Letter</td>
+                                <td>15-07-2026</td>
+                                <td>09:00 AM</td>
+                                <td><span class="badge bg-warning">Sent</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+{% endblock %}

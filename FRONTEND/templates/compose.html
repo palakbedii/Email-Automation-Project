@@ -1,0 +1,241 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Compose Mail
+{% endblock %}
+
+{% block content %}
+
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Compose Message</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+                  <li class="breadcrumb-item">
+                    <a href="#">Mailbox</a>
+                  </li>
+                  <li class="breadcrumb-item active" aria-current="page">Compose</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="app-content">
+          <div class="container-fluid">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">New Message</h3>
+              </div>
+              <div class="card-body">
+                <form class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label" for="mail-to">To</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="mail-to"
+                      placeholder="recipient@example.com"
+                      required
+                    />
+                  </div>
+                  <div class="col-12">
+                      <label class="form-label">Email Template</label>
+                      <select class="form-select" id="template">
+
+                          <option selected disabled>Select Template</option>
+
+                          {% for template in templates %}
+
+                              <option value="{{ template.name }}">
+                                  {{ template.name }}
+                              </option>
+
+                          {% endfor %}
+
+                      </select>
+                  </div>
+
+                  <div class="col-12">
+
+                      <div id="template-fields"></div>
+
+                  </div>
+
+                  <div class="col-12">
+
+                    <button
+                        type="button"
+                        class="btn btn-info"
+                        id="generate-email">
+                        Generate Email
+                    </button>
+
+                  </div>                  
+
+                  <div class="col-12">
+                    <label class="form-label" for="mail-subject">Subject</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="mail-subject"
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="mail-body">Message</label>
+                    <textarea
+                      id="mail-body"
+                      class="form-control"
+                      rows="12"
+                      placeholder="Write your message…"
+                      style="min-height: 16rem"
+                    ></textarea>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="mail-attach">Attachments</label>
+                    <input type="file" class="form-control" id="mail-attach" multiple />
+                  </div>
+                </form>
+              </div>
+              <div class="d-flex justify-content-center row gap-3 mt-3">
+                  <div class="col-md-5 pe-2">
+                      <label>Schedule Date</label>
+                      <input
+                          type="date"
+                          class="form-control"
+                          required />
+                  </div>
+                  <div class="col-md-5 pe-2">
+                      <label>Schedule Time</label>
+                      <input
+                          type="time"
+                          class="form-control"
+                          required />
+                  </div>
+              </div>              
+              <div class="d-flex justify-content-center gap-3 mt-4">
+                  <button type="button" class="btn btn-secondary">
+                      Send Now
+                  </button>
+                  <button type="button" class="btn btn-primary">
+                      Schedule Email
+                  </button>
+              </div><br>
+            </div>
+          </div>
+        </div>
+      </main>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+const templates = {{ templates|tojson }};
+
+const dropdown = document.getElementById("template");
+const subject = document.getElementById("mail-subject");
+const body = document.getElementById("mail-body");
+const fieldsDiv = document.getElementById("template-fields");
+const generateBtn = document.getElementById("generate-email");
+
+let selectedTemplate = null;
+
+dropdown.addEventListener("change", function(){
+
+    selectedTemplate = templates.find(
+        t => t.name === this.value
+    );
+
+    console.log("Selected template:");
+    console.log(selectedTemplate);
+
+    fieldsDiv.innerHTML = "";
+
+    selectedTemplate.fields.forEach(field => {
+
+        fieldsDiv.innerHTML += `
+            <div class="mb-3">
+
+                <label class="form-label">
+                    ${field.toUpperCase()}
+                </label>
+
+                <input 
+                    type="text"
+                    class="form-control"
+                    id="${field}"
+                >
+
+            </div>
+        `;
+
+    });
+
+});
+
+generateBtn.addEventListener("click", function(e){
+
+    e.preventDefault();
+
+    console.log("Generate clicked!");
+
+    if (!selectedTemplate) {
+        console.log("No template selected");
+        return;
+    }
+
+
+    let generatedSubject = selectedTemplate.subject;
+    let generatedBody = selectedTemplate.body;
+
+
+selectedTemplate.fields.forEach(field => {
+
+    const input = document.getElementById(field);
+
+    const value = input.value;
+
+    console.log("Replacing:", field, "with:", value);
+
+
+    const placeholder = new RegExp(
+        "\\{\\{" + field + "\\}\\}",
+        "g"
+    );
+
+
+    generatedSubject = generatedSubject.replace(
+        placeholder,
+        value
+    );
+
+
+    generatedBody = generatedBody.replace(
+        placeholder,
+        value
+    );
+
+});
+
+
+      console.log("FINAL SUBJECT:");
+      console.log(generatedSubject);
+
+      console.log("FINAL BODY:");
+      console.log(generatedBody);
+
+
+      // UPDATE HTML FIELDS
+      subject.value = generatedSubject;
+      body.value = generatedBody;
+
+});
+
+</script>
+
+{% endblock %}

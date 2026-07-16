@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}
+SMTP Settings
+{% endblock %}
+
+{% block content %}
+
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">SMTP Settings</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">SMTP Settings</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="app-content">
+          <div class="container-fluid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        SMTP Settings
+                    </h3>
+                </div>
+
+                <div class="card-body">
+
+                    <form method="POST">
+
+                        <div class="mb-3">
+                            <label>SMTP Host</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="smtp_host"
+                                placeholder="smtp.gmail.com"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Port</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                name="smtp_port"
+                                placeholder="587"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Sender Email</label>
+                            <input
+                                type="email"
+                                class="form-control"
+                                name="sender_email"
+                                placeholder="example@gmail.com"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>App Password</label>
+
+                            <input
+                                type="password"
+                                class="form-control"
+                                name="app_password"
+                                placeholder="Google App Password"
+                                required>
+                        </div>
+
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Save Settings
+                        </button>
+
+                    </form>
+                </div>
+            </div>            
+          </div>
+        </div>
+      </main>
+
+{% endblock %}

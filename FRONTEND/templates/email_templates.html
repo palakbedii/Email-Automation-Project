@@ -1,0 +1,433 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Email Templates
+{% endblock %}
+
+{% block content %}
+
+        <!--begin::App Content Header-->
+        <div class="app-content-header">
+          <!--begin::Container-->
+          <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Email Templates</h3>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Email Templates</li>
+                </ol>
+              </div>
+            </div>
+            <!--end::Row-->
+          </div>
+          <!--end::Container-->
+        </div>
+        <!--end::App Content Header-->
+        <!--begin::App Content-->
+        <div class="app-content">
+          <!--begin::Container-->
+          <div class="container-fluid">
+
+            <!--begin::New Templates button-->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5>Available Templates</h5>
+
+              <button class="btn btn-primary">
+                  <i class="bi bi-plus-circle"></i>
+                  New Template
+              </button>
+          </div>
+          <!--end::New Templates button-->
+
+          <!--begin::Template Search Bar-->
+          <div class="input-group mb-4">
+
+            <input
+                type="text"
+                class="form-control"
+                placeholder="Search Template">
+
+            <button class="btn btn-outline-primary">
+                Search
+            </button>
+
+          </div>
+          <!--end::Template Search Bar-->
+
+          <!--begin::Template Cards-->
+          <!-- begin::Interview Invitation -->
+          <div class="card mb-3">
+
+              <div class="card-header">
+                  <h5 class="mb-0">
+                      <i class="bi bi-envelope-paper-fill text-primary"></i>
+                      Template 1: Interview Invitation
+                  </h5>
+              </div>
+
+              <div class="card-body">
+
+                  <p>
+                      <b>Subject:</b> Interview Invitation - {{company}}
+                  </p>
+
+                  <p>
+                    <b>Message Preview:</b><br>
+                    Dear <b>{{name}}</b>,<br><br>
+
+                    We are pleased to invite you for an interview for the position of
+                    <b>{{position}}</b> at <b>{{company}}</b>.<br>
+
+                    Your interview has been scheduled on <b>{{date}}</b> at
+                    <b>{{time}}</b>. Kindly report at the mentioned venue or join using the
+                    meeting link shared with this email.<br>
+
+                    We look forward to meeting you and wish you the very best.<br><br>
+                    Regards,<br>
+                    <b>HR Team</b>
+                  </p>
+
+                  <p><b>Last Edited:</b> 8 July 2026</p>
+
+                  <div class="mt-3">
+                      <button class="btn btn-success btn-sm">
+                          <i class="bi bi-play-fill"></i> Use
+                      </button>
+
+                      <button class="btn btn-warning btn-sm">
+                          <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+
+                      <button class="btn btn-danger btn-sm">
+                          <i class="bi bi-trash"></i> Delete
+                      </button>
+                  </div>
+
+              </div>
+
+          </div>
+          <!-- end::Interview Invitation -->
+           
+          <!-- begin::Offer Letter -->
+          <div class="card mb-3">
+
+              <div class="card-header">
+                  <h5 class="mb-0">
+                      <i class="bi bi-envelope-paper-fill text-primary"></i>
+                      Template 2: Offer Letter
+                  </h5>
+              </div>
+
+              <div class="card-body">
+
+                  <p>
+                      <b>Subject:</b> Offer Letter
+                  </p>
+
+                  <p>
+                      <b>Message Preview:</b><br>
+                      Dear <b>{{name}}</b>,<br><br>
+                      Congratulations!<br>
+                      We are delighted to offer you the position of <b>{{position}}</b> at <b>{{company}}</b>.<br><br>
+                      Your skills and experience impressed us greatly, and we are excited to see the impact you will make on the [Department Name] team.
+                      Your joining date is <b>{{joining_date}}</b>.<br>
+                      Please find the attached offer letter containing your employment details, compensation package, and onboarding instructions.<br><br>
+                      We are excited to welcome you to our team and wish you a successful career with us.<br><br>
+                      Regards,<br>
+                      <b>HR Department</b>
+                  </p>
+
+                  <p class="text-muted">
+                      <b>Last Edited:</b> 10 July 2026
+                  </p>
+
+                  <div class="mt-3">
+                      <button class="btn btn-success btn-sm">
+                          <i class="bi bi-play-fill"></i> Use
+                      </button>
+
+                      <button class="btn btn-warning btn-sm">
+                          <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+
+                      <button class="btn btn-danger btn-sm">
+                          <i class="bi bi-trash"></i> Delete
+                      </button>
+                  </div>
+
+              </div>
+
+          </div>
+          <!-- end::Offer Letter -->
+           
+          <!-- begin::Welcome Email -->
+          <div class="card mb-3">
+
+              <div class="card-header">
+                  <h5 class="mb-0">
+                      <i class="bi bi-envelope-paper-fill text-primary"></i>
+                      Template 3: Welcome Email
+                  </h5>
+              </div>
+
+              <div class="card-body">
+
+                  <p><b>Subject:</b> Welcome to {{company}}</p>
+
+                  <p>
+                    <b>Message Preview:</b><br>
+                    Dear <b>{{name}}</b>,<br><br>
+
+                    Welcome to <b>{{company}}</b>! <br><br>
+
+                    We are thrilled to have you join our team. We hope your journey with us
+                    is filled with learning, growth, and exciting opportunities.<br>
+
+                    Please complete your onboarding formalities before
+                    <b>{{joining_date}}</b>. If you require any assistance, our HR team is
+                    always happy to help.<br>
+
+                    We wish you great success in your new role.<br><br>
+
+                    Warm Regards,<br>
+                    <b>HR Team</b>
+                  </p>
+
+                  <p class="text-muted">
+                      <b>Last Edited:</b> 4 July 2026
+                  </p>
+
+                  <div class="mt-3">
+                      <button class="btn btn-success btn-sm">
+                          <i class="bi bi-play-fill"></i> Use
+                      </button>
+
+                      <button class="btn btn-warning btn-sm">
+                          <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+
+                      <button class="btn btn-danger btn-sm">
+                          <i class="bi bi-trash"></i> Delete
+                      </button>
+                  </div>
+
+              </div>
+
+          </div>
+          <!-- end::Welcome Email -->
+
+          <!-- begin::Meeting Reminder -->
+          <div class="card mb-3">
+
+              <div class="card-header">
+                  <h5 class="mb-0">
+                      <i class="bi bi-envelope-paper-fill text-primary"></i>
+                      Template 4: Meeting Reminder
+                  </h5>
+              </div>
+
+              <div class="card-body">
+
+                  <p>
+                      <b>Subject:</b> Meeting Reminder
+                  </p>
+
+                  <p>
+                      <b>Message Preview:</b><br>
+                      Dear <b>{{name}}</b>,<br><br>
+
+                      This is a friendly reminder regarding your upcoming meeting.<br><br>
+
+                      Meeting Topic:
+                      <b>{{meeting_title}}</b><br>
+
+                      Date:
+                      <b>{{date}}</b><br>
+
+                      Time:
+                      <b>{{time}}</b><br><br>
+
+                      Please ensure your availability and join the meeting a few minutes
+                      before the scheduled time.<br>
+
+                      We appreciate your punctuality.
+
+                      <br><br>
+                      Thank you,<br>
+                      <b>{{company}}</b>
+                  </p>
+
+                  <p class="text-muted">
+                      <b>Last Edited:</b> 1 July 2026
+                  </p>
+
+                  <div class="mt-3">
+                      <button class="btn btn-success btn-sm">
+                          <i class="bi bi-play-fill"></i> Use
+                      </button>
+
+                      <button class="btn btn-warning btn-sm">
+                          <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+
+                      <button class="btn btn-danger btn-sm">
+                          <i class="bi bi-trash"></i> Delete
+                      </button>
+                  </div>
+
+              </div>
+
+          </div>
+          <!-- end::Meeting Reminder -->
+
+          <!-- begin::Happy Retirement -->
+          <div class="card mb-3">
+
+              <div class="card-header">
+                  <h5 class="mb-0">
+                      <i class="bi bi-envelope-paper-fill text-primary"></i>
+                      Template 5: Happy Retirement
+                  </h5>
+              </div>
+
+              <div class="card-body">
+
+                  <p>
+                      <b>Subject:</b> Happy Retirement!
+                  </p>
+
+                  <p>
+                      <b>Message Preview:</b><br>
+                      Dear <b>{{name}}</b>,<br><br>
+
+                      Congratulations on your retirement!<br><br>
+
+                      Your dedication, professionalism, and years of service have been an
+                      inspiration to everyone at <b>{{company}}</b>.<br>
+
+                      As you begin this exciting new chapter, we wish you happiness, good
+                      health, and countless memorable moments with your loved ones.<br>
+
+                      Thank you for everything you have contributed to our organization.
+
+                      <br><br>
+                      With Best Wishes,<br>
+                      <b>{{company}} Team</b>
+                  </p>
+
+                  <p class="text-muted">
+                      <b>Last Edited:</b> 3 July 2026
+                  </p>
+
+                  <div class="mt-3">
+                      <button class="btn btn-success btn-sm">
+                          <i class="bi bi-play-fill"></i> Use
+                      </button>
+
+                      <button class="btn btn-warning btn-sm">
+                          <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+
+                      <button class="btn btn-danger btn-sm">
+                          <i class="bi bi-trash"></i> Delete
+                      </button>
+                  </div>
+
+              </div>
+
+          </div>
+          <!-- end::Happy Retirement -->
+
+          <!-- begin::Event Invitation -->
+          <div class="card mb-3">
+
+              <div class="card-header">
+                  <h5 class="mb-0">
+                      <i class="bi bi-envelope-paper-fill text-primary"></i>
+                      Template 6: Event Invitation
+                  </h5>
+              </div>
+
+              <div class="card-body">
+
+                  <p>
+                      <b>Subject:</b> You're Invited: {{event_name}}
+                  </p>
+
+                  <p>
+                      <b>Message Preview:</b><br>
+                      Dear <b>{{name}}</b>,<br><br>
+
+                      Thank you for registering for {{event_name}}.<br><br>
+
+                      We are pleased to confirm your registration. Here are the event details:<br>
+
+                      Date: {{date}}<br>
+                      Time: {{time}}<br>
+                      Venue: {{venue}}<br><br>
+
+                      We look forward to welcoming you. If you have any questions, feel free to contact our support team.<br>
+                      Thank you, and see you at the event!
+
+                      <br><br>
+                      With Regards,<br>
+                      <b>Event Management Team</b>
+                  </p>
+
+                  <p class="text-muted">
+                      <b>Last Edited:</b> 11 July 2026
+                  </p>
+
+                  <div class="mt-3">
+                      <button class="btn btn-success btn-sm">
+                          <i class="bi bi-play-fill"></i> Use
+                      </button>
+
+                      <button class="btn btn-warning btn-sm">
+                          <i class="bi bi-pencil-square"></i> Edit
+                      </button>
+
+                      <button class="btn btn-danger btn-sm">
+                          <i class="bi bi-trash"></i> Delete
+                      </button>
+                  </div>
+
+              </div>
+
+          </div>
+          <!-- end::Event Invitation -->
+          <!--end::Template Cards-->
+          </div>
+          <!--end::Container-->
+        </div>
+        <!--end::App Content-->
+      </main>
+
+{% endblock %}
+
+
+<!-- 
+{% for template in templates %}
+
+<div class="card">
+
+<h5>{{ template.name }}</h5>
+
+<p>
+<b>Subject:</b>
+{{ template.subject }}
+</p>
+
+<p>
+
+{{ template.body }}
+
+</p>
+
+</div>
+
+{% endfor %} -->
