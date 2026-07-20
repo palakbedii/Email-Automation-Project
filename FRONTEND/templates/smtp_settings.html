@@ -32,16 +32,29 @@ SMTP Settings
 
                 <div class="card-body">
 
+                  {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
                     <form method="POST">
 
                         <div class="mb-3">
                             <label>SMTP Host</label>
                             <input
-                                type="text"
-                                class="form-control"
-                                name="smtp_host"
-                                placeholder="smtp.gmail.com"
-                                required>
+                              type="text"
+                              class="form-control"
+                              name="smtp_host"
+                              value="{{ settings.get('smtp_host', '') if settings else '' }}"
+                              placeholder="smtp.gmail.com"
+                              required>
                         </div>
 
                         <div class="mb-3">
@@ -50,6 +63,7 @@ SMTP Settings
                                 type="number"
                                 class="form-control"
                                 name="smtp_port"
+                                value="{{ settings.get('smtp_port', '') if settings else '' }}"
                                 placeholder="587"
                                 required>
                         </div>
@@ -60,6 +74,7 @@ SMTP Settings
                                 type="email"
                                 class="form-control"
                                 name="sender_email"
+                                value="{{ settings.get('sender_email', '') if settings else '' }}"
                                 placeholder="example@gmail.com"
                                 required>
                         </div>
@@ -71,11 +86,12 @@ SMTP Settings
                                 type="password"
                                 class="form-control"
                                 name="app_password"
+                                value="{{ settings.get('app_password', '') if settings else '' }}"
                                 placeholder="Google App Password"
                                 required>
                         </div>
 
-                        <button class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i>
                             Save Settings
                         </button>
