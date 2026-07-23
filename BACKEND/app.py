@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+from smtp import send_email
 
 from models import (
     EmailRequest,
+    SendNowRequest,
     TemplateRequest,
     SMTPRequest
 )
@@ -11,8 +13,13 @@ from database import (
     get_pending_emails,
     store_to_sql,
     retrieve_templates,
+    get_all_templates,
+    delete_template,
+    update_template,
+    search_templates,
     get_sent_emails,
     get_allemails,
+    save_sent_email,
     scheduled_emails_count,
     get_totalemails_count,
     sent_emails_count,
@@ -37,6 +44,22 @@ def schedule(data: EmailRequest):
 
     return {
         "message": "Email Scheduled Successfully"
+    }
+
+
+@app.post("/emails/send_now")
+def send_now(data: SendNowRequest):
+
+    send_email(
+        data.recipient,
+        data.subject,
+        data.message
+    )
+
+    save_sent_email(data)
+
+    return {
+        "message": "Email Sent Successfully"
     }
 
 
@@ -95,6 +118,13 @@ def store_templates(template_data: TemplateRequest):
         "message": "Templates saved successfully"
     }
 
+@app.get("/templates/search")
+def search_template(keyword: str):
+
+    result = search_templates(keyword)
+
+    return result
+
 
 @app.get("/templates/{id}")
 def get_stored_templates(id: int):
@@ -102,8 +132,35 @@ def get_stored_templates(id: int):
     get_template = retrieve_templates(id)
 
     return {
-        "subject": get_template[0],
-        "body": get_template[1]
+        "id": get_template[0],
+        "name": get_template[1],
+        "subject": get_template[2],
+        "body": get_template[3],
+        "last_edited": get_template[4]
+    }
+
+@app.get("/templates")
+def get_templates():
+
+    templates = get_all_templates()
+    return templates
+
+@app.delete("/templates/{id}")
+def remove_template(id: int):
+
+    delete_template(id)
+
+    return {
+        "message": "Template deleted successfully"
+    }
+
+@app.put("/templates/{id}")
+def edit_template(id: int, template_data: TemplateRequest):
+
+    update_template(template_data, id)
+
+    return {
+        "message": "Template updated successfully"
     }
 
 

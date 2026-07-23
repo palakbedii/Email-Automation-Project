@@ -1,7 +1,6 @@
 from flask import Flask, render_template, redirect, request, flash, url_for
+from datetime import datetime
 import requests
-
-from templates_data import email_templates as templates_list
 
 app = Flask(__name__)
 app.secret_key = "email_automation_project"
@@ -15,10 +14,171 @@ def dashboard():
 @app.route("/email_templates")
 def email_templates():
 
+    keyword = request.args.get("keyword")
+
+    if keyword:
+
+        response = requests.get(
+            "http://127.0.0.1:8000/templates/search",
+            params={"keyword": keyword}
+        )
+
+    else:
+
+        response = requests.get(
+            "http://127.0.0.1:8000/templates"
+        )
+
+    templates = response.json()
+
     return render_template(
         "email_templates.html",
-        templates=templates_list
+        templates=templates,
+        keyword=keyword
     )
+
+@app.route("/new_template", methods=["GET", "POST"])
+def new_template():
+
+    if request.method == "POST":
+
+        print("FORM SUBMITTED")
+        print(request.form)
+
+        data = {
+        "name": request.form["name"],
+        "subject": request.form["subject"],
+        "body": request.form["body"],
+        "last_edited": datetime.now().strftime("%d-%m-%Y %H:%M")
+        }
+
+        print(data)
+        
+        response = requests.post(
+            "http://127.0.0.1:8000/templates",
+            json=data
+        )
+        
+        print("Status Code:", response.status_code)
+        print("Response:", response.text)
+
+        if response.status_code == 200:
+
+            flash(
+                "Template created successfully!",
+                "success"
+            )
+
+            return redirect(url_for("email_templates"))
+
+        flash(
+            "Unable to save template.",
+            "danger"
+        )
+
+        return redirect(url_for("new_template"))
+
+    return render_template("new_template.html")
+
+
+@app.route("/edit_template/<int:id>", methods=["GET", "POST"])
+def edit_template(id):
+
+    if request.method == "POST":
+
+        data = {
+            "name": request.form["name"],
+            "subject": request.form["subject"],
+            "body": request.form["body"],
+            "last_edited": datetime.now().strftime("%d-%m-%Y %H:%M")
+        }
+
+        response = requests.put(
+            f"http://127.0.0.1:8000/templates/{id}",
+            json=data
+        )
+
+        if response.status_code == 200:
+
+            flash(
+                "Template updated successfully!",
+                "success"
+            )
+
+            return redirect(url_for("email_templates"))
+
+        flash(
+            "Unable to update template.",
+            "danger"
+        )
+
+        return redirect(url_for("edit_template", id=id))
+
+    response = requests.get(
+        f"http://127.0.0.1:8000/templates/{id}"
+    )
+
+    template = response.json()
+
+    return render_template(
+        "edit_template.html",
+        template=template
+    )
+
+
+@app.route("/delete_template/<int:id>")
+def delete_template(id):
+
+    response = requests.delete(
+        f"http://127.0.0.1:8000/templates/{id}"
+    )
+
+    if response.status_code == 200:
+
+        flash(
+            "Template deleted successfully!",
+            "success"
+        )
+
+    else:
+
+        flash(
+            "Unable to delete template.",
+            "danger"
+        )
+
+    return redirect(url_for("email_templates"))
+
+
+@app.route("/send_now", methods=["POST"])
+def send_now():
+
+    data = {
+        "recipient": request.form["recipient"],
+        "subject": request.form["subject"],
+        "message": request.form["message"],
+    }
+
+    response = requests.post(
+        "http://127.0.0.1:8000/emails/send_now",
+        json=data
+    )
+
+    if response.status_code == 200:
+
+        flash(
+            "Email Sent Successfully!",
+            "success"
+        )
+
+    else:
+
+        flash(
+            "Unable to send email.",
+            "danger"
+        )
+
+    return redirect(url_for("compose"))
 
 
 @app.route("/compose", methods=["GET", "POST"])
@@ -61,9 +221,24 @@ def compose():
 
         return redirect(url_for("compose"))
 
+    template_id = request.args.get("template_id")
+    selected_template = None
+
+    if template_id:
+
+        response = requests.get(
+            f"http://127.0.0.1:8000/templates/{template_id}"
+        )
+
+        selected_template = response.json()
+
+    response = requests.get("http://127.0.0.1:8000/templates")
+    templates = response.json()
+
     return render_template(
         "compose.html",
-        templates=templates_list
+        templates=templates,
+        selected_template=selected_template
     )
 
 

@@ -57,22 +57,36 @@ Compose Mail
                       required
                     />
                   </div>
-                  <div class="col-12">
-                      <label class="form-label">Email Template</label>
-                      <select class="form-select" id="template">
 
-                          <option selected disabled>Select Template</option>
+                <div class="col-12">
 
-                          {% for template in templates %}
+                    <label class="form-label">
+                        Email Template
+                    </label>
 
-                              <option value="{{ template.name }}">
-                                  {{ template.name }}
-                              </option>
 
-                          {% endfor %}
+                    <select 
+                        class="form-select" 
+                        id="template"
+                        name="template">
 
-                      </select>
-                  </div>
+                        <option value="" selected disabled>
+                            Select Template
+                        </option>
+
+
+                        {% for template in templates %}
+
+                            <option value="{{ template.name }}">
+                                Template {{ template.id }}: {{ template.name }}
+                            </option>
+
+                        {% endfor %}
+
+
+                    </select>
+
+                </div>
 
                   <div class="col-12">
 
@@ -98,6 +112,7 @@ Compose Mail
                         class="form-control"
                         id="mail-subject"
                         name="subject"
+                        value="{{ selected_template.subject if selected_template else '' }}"
                     />
                   </div>
                   <div class="col-12">
@@ -109,7 +124,7 @@ Compose Mail
                       rows="12"
                       placeholder="Write your message…"
                       style="min-height: 16rem"
-                    ></textarea>
+                    >{{ selected_template.body if selected_template else '' }}</textarea>
                   </div>
                   <div class="col-12">
                     <label class="form-label" for="mail-attach">Attachments</label>
@@ -122,6 +137,7 @@ Compose Mail
                       <label>Schedule Date</label>
                       <input
                           type="date"
+                          id="schedule-date"
                           class="form-control"
                           name="date"
                           required />
@@ -130,18 +146,25 @@ Compose Mail
                       <label>Schedule Time</label>
                       <input
                           type="time"
+                          id="schedule-time"
                           class="form-control"
                           name="time"
                           required />
                   </div>
               </div>              
               <div class="d-flex justify-content-center gap-3 mt-4">
-                  <button type="button" class="btn btn-secondary">
-                      Send Now
+                  <button
+                        type="submit"
+                        class="btn btn-secondary"
+                        id="send-now"
+                        formaction="{{ url_for('send_now') }}">
+                        Send Now
                   </button>
-                  <button type="submit" 
-                      class="btn btn-primary">
-                      Schedule Email
+                  <button
+                        type="submit" 
+                        class="btn btn-primary"
+                        id="schedule-btn">
+                        Schedule Email
                   </button>
               </div><br>
                 </form>              
@@ -165,6 +188,9 @@ const fieldsDiv = document.getElementById("template-fields");
 const generateBtn = document.getElementById("generate-email");
 
 let selectedTemplate = null;
+let fields = [];
+
+// When template is selected
 
 dropdown.addEventListener("change", function(){
 
@@ -172,89 +198,136 @@ dropdown.addEventListener("change", function(){
         t => t.name === this.value
     );
 
-    console.log("Selected template:");
+    console.log("Selected Template:");
     console.log(selectedTemplate);
 
     fieldsDiv.innerHTML = "";
 
-    selectedTemplate.fields.forEach(field => {
+    fields = [];
+
+    // Extract {{variables}} from subject and body
+    
+    {% raw %}
+    const placeholders = [
+        ...selectedTemplate.subject.matchAll(/{{(.*?)}}/g),
+        ...selectedTemplate.body.matchAll(/{{(.*?)}}/g)
+    ];
+
+    {% endraw %}
+
+    fields = [
+        ...new Set(
+            placeholders.map(
+                item => item[1]
+            )
+        )
+    ];
+
+    console.log("Detected Fields:");
+    console.log(fields);
+
+
+    // Create input boxes
+
+    fields.forEach(field => {
 
         fieldsDiv.innerHTML += `
-            <div class="mb-3">
 
-                <label class="form-label">
-                    ${field.toUpperCase()}
-                </label>
+        <div class="mb-3">
 
-                <input 
-                    type="text"
-                    class="form-control"
-                    id="${field}"
-                >
+            <label class="form-label">
+                ${field.toUpperCase()}
+            </label>
 
-            </div>
+
+            <input
+                type="text"
+                class="form-control"
+                id="${field}"
+                placeholder="Enter ${field}"
+            >
+
+        </div>
+
         `;
 
     });
 
+
 });
+
+
+// Generate Email Button
 
 generateBtn.addEventListener("click", function(e){
 
     e.preventDefault();
 
-    console.log("Generate clicked!");
+    console.log("Generate clicked");
 
-    if (!selectedTemplate) {
-        console.log("No template selected");
+    if(!selectedTemplate){
+
+        alert("Please select a template first");
         return;
-    }
 
+    }
 
     let generatedSubject = selectedTemplate.subject;
     let generatedBody = selectedTemplate.body;
 
+    fields.forEach(field => {
 
-selectedTemplate.fields.forEach(field => {
+        const input =
+            document.getElementById(field);
 
-    const input = document.getElementById(field);
+        const value =
+            input ? input.value : "";
 
-    const value = input.value;
+        const placeholder = new RegExp(
+            "\\{\\{\\s*" + field + "\\s*\\}\\}",
+            "g"
+        );
 
-    console.log("Replacing:", field, "with:", value);
+        generatedSubject =
+            generatedSubject.replace(
+                placeholder,
+                value
+            );
+
+        generatedBody =
+            generatedBody.replace(
+                placeholder,
+                value
+            );
+
+    });
+
+    console.log("Generated Subject:");
+    console.log(generatedSubject);
+
+    console.log("Generated Body:");
+    console.log(generatedBody);
 
 
-    const placeholder = new RegExp(
-        "\\{\\{" + field + "\\}\\}",
-        "g"
-    );
+    // Fill email fields
 
-
-    generatedSubject = generatedSubject.replace(
-        placeholder,
-        value
-    );
-
-
-    generatedBody = generatedBody.replace(
-        placeholder,
-        value
-    );
+    subject.value = generatedSubject;
+    body.value = generatedBody;
 
 });
 
 
-      console.log("FINAL SUBJECT:");
-      console.log(generatedSubject);
+const dateInput = document.getElementById("schedule-date");
+const timeInput = document.getElementById("schedule-time");
 
-      console.log("FINAL BODY:");
-      console.log(generatedBody);
+document.getElementById("send-now").addEventListener("click", function () {
+    dateInput.required = false;
+    timeInput.required = false;
+});
 
-
-      // UPDATE HTML FIELDS
-      subject.value = generatedSubject;
-      body.value = generatedBody;
-
+document.getElementById("schedule-btn").addEventListener("click", function () {
+    dateInput.required = true;
+    timeInput.required = true;
 });
 
 </script>

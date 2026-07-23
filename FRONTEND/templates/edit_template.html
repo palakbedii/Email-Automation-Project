@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+
+{% block title %}
+New Template
+{% endblock %}
+
+{% block content %}
+
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Edit Email Template</h3>
+            </div>
+
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('dashboard') }}">Home</a>
+                    </li>
+
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('email_templates') }}">Email Templates</a>
+                    </li>
+
+                    <li class="breadcrumb-item active">
+                        New Template
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!--end::App Content Header-->
+
+<!--begin::App Content-->
+<div class="app-content">
+
+    <div class="container-fluid">
+
+        <div class="card card-primary">
+
+            <div class="card-header">
+                <h3 class="card-title">
+                    Template Details
+                </h3>
+            </div>
+
+            <form method="POST">
+
+                <div class="card-body">
+
+                    <!-- Template Name -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Template Name
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="name"
+                            value="{{ template.name }}"
+                            placeholder="Enter template name"
+                            required
+                        >
+                    </div>
+
+                    <!-- Subject -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Email Subject
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="subject"
+                            value="{{ template.subject }}"
+                            placeholder="Enter email subject"
+                            required
+                        >
+                    </div>
+
+                    <!-- Body -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Email Body
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            name="body"
+                            rows="10"
+                            placeholder="Write your email template here..."
+                            required
+                        >{{ template.body }}</textarea>
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+                        <i class="bi bi-save"></i>
+                        Update Template
+                    </button>
+
+                    <a
+                        href="{{ url_for('email_templates') }}"
+                        class="btn btn-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+<!--end::App Content-->
+
+{% endblock %}

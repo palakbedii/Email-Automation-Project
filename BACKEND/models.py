@@ -2,6 +2,7 @@ from datetime import date, time
 from pydantic import BaseModel
 from pydantic import EmailStr
 
+# For Scheduling Email
 class EmailRequest(BaseModel):
     recipient: EmailStr
     subject: str
@@ -9,8 +10,13 @@ class EmailRequest(BaseModel):
     date: date
     time: time
 
+# For Sending Email Now
+class SendNowRequest(BaseModel):
+    recipient: EmailStr
+    subject: str
+    message: str    
+
 class TemplateRequest(BaseModel):
-    id: int
     name: str
     subject: str
     body: str

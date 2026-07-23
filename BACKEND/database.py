@@ -47,6 +47,26 @@ def send_to_sql(data):
     conn.close()
 
 
+def save_sent_email(data):
+
+    conn = sqlite3.connect("emails.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO emails(recipient, subject, message, date, time, status)
+    VALUES(?,?,?,?,?,?)
+    """, (
+        data.recipient,
+        data.subject,
+        data.message,
+        datetime.now().strftime("%d-%m-%Y"),
+        datetime.now().strftime("%H:%M"),
+        "Sent"
+    ))
+
+    conn.commit()
+    conn.close()
+
 def get_pending_emails():
 
     conn = sqlite3.connect("emails.db")
@@ -103,20 +123,19 @@ def store_to_sql(template_data):
     cursor = conn.cursor()
 
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS templates(
-        id INTEGER PRIMARY KEY,
+    CREATE TABLE IF NOT EXISTS templates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         subject TEXT NOT NULL,
         body TEXT NOT NULL,
-        last_edited TEXT NOT NULL
-    )
+        last_edited TEXT
+    );
     """)
 
     cursor.execute("""
-    INSERT INTO templates(id, name, subject, body, last_edited)
-    VALUES(?,?,?,?,?)
+    INSERT INTO templates(name, subject, body, last_edited)
+    VALUES(?,?,?,?)
     """, (
-        template_data.id,
         template_data.name,
         template_data.subject,
         template_data.body,
@@ -133,7 +152,7 @@ def retrieve_templates(id):
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT subject, body
+    SELECT *
     FROM templates
     WHERE id = ?
     """, (id,))
@@ -142,6 +161,84 @@ def retrieve_templates(id):
 
     conn.close()
     return get_template
+
+def get_all_templates():
+
+    conn = sqlite3.connect("templates.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT *
+    FROM templates
+    ORDER BY id
+    """)
+
+    templates = cursor.fetchall()
+
+    conn.close()
+    return [dict(template) for template in templates]
+
+def search_templates(keyword):
+
+    conn = sqlite3.connect("templates.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT *
+    FROM templates
+    WHERE
+        name LIKE ?
+        OR subject LIKE ?
+        OR body LIKE ?
+    """, (
+        f"%{keyword}%",
+        f"%{keyword}%",
+        f"%{keyword}%"
+    ))
+
+    result = cursor.fetchall()
+
+    conn.close()
+    return [dict(template) for template in result]
+
+def delete_template(id):
+
+    conn = sqlite3.connect("templates.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    DELETE FROM templates
+    WHERE id=?
+    """,(id,))
+
+    conn.commit()
+    conn.close()
+
+def update_template(template_data, id):
+
+    conn = sqlite3.connect("templates.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE templates
+    SET
+        name=?,
+        subject=?,
+        body=?,
+        last_edited=?
+    WHERE id=?
+    """, (
+        template_data.name,
+        template_data.subject,
+        template_data.body,
+        template_data.last_edited,
+        id
+    ))
+
+    conn.commit()
+    conn.close()
 
 
 def failed_emails_count():
