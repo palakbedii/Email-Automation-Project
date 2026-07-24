@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, request, flash, url_for
 from datetime import datetime
+from email_validator import validate_email, EmailNotValidError
 import requests
 
 app = Flask(__name__)
@@ -153,10 +154,50 @@ def delete_template(id):
 @app.route("/send_now", methods=["POST"])
 def send_now():
 
+    recipient = request.form["recipient"].strip()
+    subject = request.form["subject"].strip()
+    message = request.form["message"].strip()
+
+    # 1. Check recipient empty
+    if not recipient:
+        flash(
+            "Recipient email is required.",
+            "danger"
+        )
+        return redirect(url_for("compose"))
+
+    # 2. Check email format
+    try:
+        validate_email(recipient)
+
+    except EmailNotValidError:
+        flash(
+            "Please enter a valid email address.",
+            "danger"
+        )
+        return redirect(url_for("compose"))
+
+    # 3. Check subject
+    if not subject:
+        flash(
+            "Subject cannot be empty.",
+            "danger"
+        )
+        return redirect(url_for("compose"))
+
+    # 4. Check message
+    if not message:
+        flash(
+            "Message cannot be empty.",
+            "danger"
+        )
+        return redirect(url_for("compose"))
+
+    # Only after validation:
     data = {
-        "recipient": request.form["recipient"],
-        "subject": request.form["subject"],
-        "message": request.form["message"],
+        "recipient": recipient,
+        "subject": subject,
+        "message": message,
     }
 
     response = requests.post(
@@ -164,22 +205,23 @@ def send_now():
         json=data
     )
 
+    result = response.json()
+
     if response.status_code == 200:
 
         flash(
-            "Email Sent Successfully!",
+            result.get("message", "Email Sent Successfully!"),
             "success"
         )
 
     else:
 
         flash(
-            "Unable to send email.",
+            result.get("detail", "Unable to send email."),
             "danger"
         )
 
     return redirect(url_for("compose"))
-
 
 @app.route("/compose", methods=["GET", "POST"])
 def compose():

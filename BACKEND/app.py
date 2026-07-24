@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from smtp import send_email
 
 from models import (
@@ -18,8 +18,9 @@ from database import (
     update_template,
     search_templates,
     get_sent_emails,
+    get_failed_emails,
     get_allemails,
-    save_sent_email,
+    save_email,
     scheduled_emails_count,
     get_totalemails_count,
     sent_emails_count,
@@ -50,17 +51,35 @@ def schedule(data: EmailRequest):
 @app.post("/emails/send_now")
 def send_now(data: SendNowRequest):
 
-    send_email(
-        data.recipient,
-        data.subject,
-        data.message
-    )
+    try:
+        send_email(
+            data.recipient,
+            data.subject,
+            data.message
+        )
 
-    save_sent_email(data)
+        save_email(
+            data,
+            status="Sent"
+        )
 
-    return {
-        "message": "Email Sent Successfully"
-    }
+        return {
+            "message": "Email Sent Successfully"
+        }
+
+
+    except Exception as e:
+
+        save_email(
+            data,
+            status="Failed",
+            error=str(e)
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 
 @app.get("/emails")
@@ -99,12 +118,14 @@ def callpendingemails():
     }
 
 
-@app.get("/emails/failed/count")
-def get_failed_count():
+@app.get("/emails/failed")
+def callfailed_emails():
 
+    failed = get_failed_emails()
     failed_count = failed_emails_count()
 
     return {
+        "emails": failed,
         "failed_count": failed_count
     }
 

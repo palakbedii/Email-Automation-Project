@@ -3,8 +3,7 @@ from datetime import datetime
 
 from database import (
     get_pending_emails,
-    update_status,
-    update_status_failed
+    update_status
 )
 
 from smtp import send_email
@@ -42,7 +41,7 @@ def scheduler():
                 try:
                     send_email(recipient, subject, message)
 
-                    update_status(email_id)
+                    update_status(email_id, "Sent", None)
 
                     print("Email Sent Successfully")
 
@@ -50,7 +49,7 @@ def scheduler():
 
                     print("SMTP Error:", e)
 
-                    update_status_failed(email_id)
+                    update_status(email_id, "Failed", str(e))
 
                     print("Email Sending Failed")
                 

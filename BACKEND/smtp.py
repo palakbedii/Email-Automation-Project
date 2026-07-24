@@ -33,22 +33,55 @@ def send_email(recipient, subject, message):
     msg["From"] = sender
     msg["To"] = recipient
 
-    # Connect to SMTP server
-    server = smtplib.SMTP(smtp_host, int(smtp_port))
+    try:
 
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
+        # Connect to SMTP server
+        server = smtplib.SMTP(
+            smtp_host,
+            int(smtp_port)
+        )
 
-    # Login
-    server.login(sender, password)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
 
-    # Send email
-    server.sendmail(
-        sender,
-        recipient,
-        msg.as_string()
-    )
+        # Login
+        server.login(
+            sender,
+            password
+        )
 
-    # Close connection
-    server.quit()
+        # Send email
+        server.sendmail(
+            sender,
+            recipient,
+            msg.as_string()
+        )
+
+        # Close connection
+        server.quit()
+
+    except smtplib.SMTPAuthenticationError:
+
+        raise Exception(
+            "SMTP Authentication Failed. "
+            "Please check your email and app password."
+        )
+
+    except smtplib.SMTPConnectError:
+
+        raise Exception(
+            "Unable to connect to SMTP server."
+        )
+
+    except smtplib.SMTPRecipientsRefused:
+
+        raise Exception(
+            "Recipient email address was rejected."
+        )
+
+    except Exception as e:
+
+        raise Exception(
+            str(e)
+        )

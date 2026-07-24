@@ -15,7 +15,8 @@ def create_email_table():
         message TEXT,
         date TEXT,
         time TEXT,
-        status TEXT
+        status TEXT,
+        error TEXT
     )
     """)
 
@@ -47,22 +48,24 @@ def send_to_sql(data):
     conn.close()
 
 
-def save_sent_email(data):
+def save_email(data, status, error=None):
 
     conn = sqlite3.connect("emails.db")
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO emails(recipient, subject, message, date, time, status)
-    VALUES(?,?,?,?,?,?)
+    INSERT INTO emails(recipient, subject, message, date, time, status, error)
+    VALUES(?,?,?,?,?,?,?)
     """, (
         data.recipient,
         data.subject,
         data.message,
         datetime.now().strftime("%d-%m-%Y"),
         datetime.now().strftime("%H:%M"),
-        "Sent"
-    ))
+        status,
+        error
+        )
+    )
 
     conn.commit()
     conn.close()
@@ -85,35 +88,19 @@ def get_pending_emails():
     return emails
 
 
-def update_status(email_id):
+def update_status(email_id, status, error=None):
 
     conn = sqlite3.connect("emails.db")
     cursor = conn.cursor()
 
     cursor.execute("""
-    UPDATE emails
-    SET status='Sent'
-    WHERE id=?
-    """, (email_id,))
+        UPDATE emails
+        SET status=?,
+        error=?,
+        WHERE id=?
+    """, (status, error, email_id))
 
     conn.commit()
-    print(f"Email {email_id} marked as Sent")
-    conn.close()
-
-
-def update_status_failed(email_id):
-
-    conn = sqlite3.connect("emails.db")
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    UPDATE emails
-    SET status='Failed'
-    WHERE id=?
-    """, (email_id,))
-
-    conn.commit()
-    print(f"Email {email_id} marked as Failed")
     conn.close()
 
 
@@ -282,6 +269,24 @@ def get_sent_emails():
     emails = cursor.fetchall()
 
     print("Sent emails are", emails)
+
+    conn.close()
+    return emails
+
+def get_failed_emails():
+
+    conn = sqlite3.connect("emails.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT *
+    FROM emails
+    WHERE STATUS = 'Failed'
+    """)
+
+    emails = cursor.fetchall()
+
+    print("Failed emails are", emails)
 
     conn.close()
     return emails
