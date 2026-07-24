@@ -45,46 +45,8 @@ Sent Emails
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td>
-                                    <span class="badge bg-warning">Sent</span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>2</td>
-                                <td>hr@google.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                                <td>
-                                    <span class="badge bg-warning">Sent</span>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td>3</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td><span class="badge bg-warning">Sent</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>4</td>
-                                <td>hr@microsoft.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                                <td><span class="badge bg-warning">Sent</span></td>
-                            </tr>
+                        <tbody id="sent-table">
+                            
                         </tbody>
                     </table>
                 </div>
@@ -92,5 +54,28 @@ Sent Emails
           </div>
         </div>
       </main>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/email_table.js') }}"></script>
+
+<script>
+
+function refreshSent() {
+    loadEmailTable(
+        "http://127.0.0.1:8000/emails/sent",
+        "sent-table",
+        "success",
+        "Sent"
+    );
+
+}
+refreshSent();
+setInterval(refreshSent,5000);
+
+</script>
 
 {% endblock %}

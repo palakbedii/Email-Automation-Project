@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from smtp import send_email
 
 from models import (
@@ -10,19 +11,20 @@ from models import (
 
 from database import (
     send_to_sql,
-    get_pending_emails,
     store_to_sql,
     retrieve_templates,
     get_all_templates,
     delete_template,
     update_template,
     search_templates,
+    email_to_dict,
+    get_pending_emails,
     get_sent_emails,
     get_failed_emails,
     get_allemails,
     save_email,
-    scheduled_emails_count,
     get_totalemails_count,
+    scheduled_emails_count,
     sent_emails_count,
     failed_emails_count,
     create_smtp_table,
@@ -33,6 +35,17 @@ from database import (
 app = FastAPI()
 
 create_smtp_table()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5000",
+        "http://localhost:5000"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/emails")
@@ -93,28 +106,43 @@ def callallemails():
         "total_emails": total_emails
     }
 
-
-@app.get("/emails/sent")
-def callsent_emails():
-
-    sent = get_sent_emails()
-    sent_count = sent_emails_count()
-
+@app.get("/dashboard")
+def dashboard():
     return {
-        "emails": sent,
-        "sent_count": sent_count
+        "scheduled": scheduled_emails_count(),
+        "sent": sent_emails_count(),
+        "failed": failed_emails_count(),
+        "templates": len(get_all_templates())
     }
 
 
 @app.get("/emails/scheduled")
 def callpendingemails():
 
-    pending_emails = get_pending_emails()
-    scheduled_count = scheduled_emails_count()
+    pending = get_pending_emails()
+
+    emails = [
+        email_to_dict(email)
+        for email in pending
+    ]
 
     return {
-        "emails": pending_emails,
-        "scheduled_count": scheduled_count
+        "emails": emails
+    }
+
+
+@app.get("/emails/sent")
+def callsent_emails():
+
+    sent = get_sent_emails()
+
+    emails = [
+        email_to_dict(email)
+        for email in sent
+    ]
+
+    return {
+        "emails": emails
     }
 
 
@@ -122,11 +150,14 @@ def callpendingemails():
 def callfailed_emails():
 
     failed = get_failed_emails()
-    failed_count = failed_emails_count()
+
+    emails = [
+        email_to_dict(email)
+        for email in failed
+    ]
 
     return {
-        "emails": failed,
-        "failed_count": failed_count
+        "emails": emails
     }
 
 

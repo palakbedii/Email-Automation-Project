@@ -27,7 +27,7 @@ Dashboard
                 <!--begin::Small Box Widget 1-->
                 <div class="small-box text-bg-primary">
                   <div class="inner">
-                    <h3>10</h3>
+                    <h3 id="scheduled-count">0</h3>
                     <p>Scheduled Emails</p>
                   </div>
 
@@ -59,7 +59,7 @@ Dashboard
                 <!--begin::Small Box Widget 2-->
                 <div class="small-box text-bg-success">
                   <div class="inner">
-                    <h3>13</h3>
+                    <h3 id="sent-count">0</h3>
                     <p>Sent Emails</p>
                   </div>
 
@@ -89,7 +89,7 @@ Dashboard
                 <!--begin::Small Box Widget 3-->
                 <div class="small-box text-bg-warning">
                   <div class="inner">
-                    <h3>2</h3>
+                    <h3 id="failed-count">0</h3>
                     <p>Failed Emails</p>
                   </div>
 
@@ -120,7 +120,7 @@ Dashboard
                 <!--begin::Small Box Widget 4-->
                 <div class="small-box text-bg-danger">
                   <div class="inner">
-                    <h3>7</h3>
+                    <h3 id="template-count">0</h3>
                     <p>Total Templates</p>
                   </div>
 
@@ -169,42 +169,8 @@ Dashboard
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td><span class="badge bg-warning">Scheduled</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>2</td>
-                                <td>hr@google.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                                <td><span class="badge bg-warning">Scheduled</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>3</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td><span class="badge bg-warning">Scheduled</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>4</td>
-                                <td>hr@microsoft.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                                <td><span class="badge bg-warning">Scheduled</span></td>
-                            </tr>
+                        <tbody id="dashboard-scheduled-table">
+                        
                         </tbody>
                       </table>
                     </div>
@@ -226,42 +192,8 @@ Dashboard
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td><span class="badge bg-warning">Sent</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>2</td>
-                                <td>hr@google.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                                <td><span class="badge bg-warning">Sent</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>3</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td><span class="badge bg-warning">Sent</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>4</td>
-                                <td>hr@microsoft.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                                <td><span class="badge bg-warning">Sent</span></td>
-                            </tr>
+                        <tbody id="dashboard-sent-table">
+                            
                         </tbody>
                       </table>
 
@@ -278,4 +210,55 @@ Dashboard
         <!--end::App Content-->
       </main>
       
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+async function loadDashboard() {
+
+    const response = await fetch("http://127.0.0.1:8000/dashboard");
+    const data = await response.json();
+
+    console.log(data);
+
+    document.getElementById("scheduled-count").innerText = data.scheduled;
+    document.getElementById("sent-count").innerText = data.sent;
+    document.getElementById("failed-count").innerText = data.failed;
+    document.getElementById("template-count").innerText = data.templates;
+}
+
+loadDashboard();
+setInterval(loadDashboard, 5000);
+
+</script>
+
+
+<script src="{{ url_for('static', filename='js/email_table.js') }}"></script>
+
+<script>
+
+function refreshDashboardTables(){
+
+    loadDashboardTable(
+        "http://127.0.0.1:8000/emails/scheduled",
+        "dashboard-scheduled-table",
+        "warning",
+        "Scheduled"
+    );
+
+    loadDashboardTable(
+        "http://127.0.0.1:8000/emails/sent",
+        "dashboard-sent-table",
+        "success",
+        "Sent"
+    );
+
+}
+refreshDashboardTables();
+setInterval(refreshDashboardTables,5000);
+
+</script>
+
 {% endblock %}

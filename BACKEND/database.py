@@ -75,10 +75,14 @@ def get_pending_emails():
     conn = sqlite3.connect("emails.db")
     cursor = conn.cursor()
 
-    cursor.execute("""
-    SELECT * FROM emails
-    WHERE status='Pending'
-    """)
+    cursor.execute(
+        """
+        SELECT *
+        FROM emails
+        WHERE status='Scheduled'
+        ORDER BY id DESC
+        """
+    )
 
     emails = cursor.fetchall()
 
@@ -95,14 +99,25 @@ def update_status(email_id, status, error=None):
 
     cursor.execute("""
         UPDATE emails
-        SET status=?,
-        error=?,
+        SET status=?, error=?
         WHERE id=?
     """, (status, error, email_id))
 
     conn.commit()
     conn.close()
 
+def email_to_dict(email):
+
+    return {
+        "id": email[0],
+        "recipient": email[1],
+        "subject": email[2],
+        "message": email[3],
+        "date": email[4],
+        "time": email[5],
+        "status": email[6],
+        "error": email[7]
+    }
 
 def store_to_sql(template_data):
 
@@ -262,9 +277,14 @@ def get_sent_emails():
     conn = sqlite3.connect("emails.db")
     cursor = conn.cursor()
 
-    cursor.execute("""SELECT * FROM emails
-                WHERE STATUS = 'Sent'
-    """)
+    cursor.execute(
+        """
+        SELECT *
+        FROM emails
+        WHERE status='Sent'
+        ORDER BY id DESC
+        """
+    )
 
     emails = cursor.fetchall()
 
@@ -278,11 +298,14 @@ def get_failed_emails():
     conn = sqlite3.connect("emails.db")
     cursor = conn.cursor()
 
-    cursor.execute("""
-    SELECT *
-    FROM emails
-    WHERE STATUS = 'Failed'
-    """)
+    cursor.execute(
+        """
+        SELECT *
+        FROM emails
+        WHERE status='Failed'
+        ORDER BY id DESC
+        """
+    )
 
     emails = cursor.fetchall()
 

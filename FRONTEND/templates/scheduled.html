@@ -45,42 +45,8 @@ Scheduled Emails
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td><span class="badge bg-warning">Scheduled</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>2</td>
-                                <td>hr@google.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                                <td><span class="badge bg-warning">Scheduled</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>3</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td><span class="badge bg-warning">Scheduled</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>4</td>
-                                <td>hr@microsoft.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                                <td><span class="badge bg-warning">Scheduled</span></td>
-                            </tr>
+                        <tbody id="scheduled-table">
+                          
                         </tbody>
                     </table>
                 </div>
@@ -93,18 +59,24 @@ Scheduled Emails
 {% endblock %}
 
 
+{% block scripts %}
 
+<script src="{{ url_for('static', filename='js/email_table.js') }}"></script>
 
-<!-- 
-<tbody>
-{% for email in emails %}
-<tr>
-    <td>{{ email.id }}</td>
-    <td>{{ email.recipient }}</td>
-    <td>{{ email.subject }}</td>
-    <td>{{ email.date }}</td>
-    <td>{{ email.time }}</td>
-    <td>{{ email.status }}</td>
-</tr>
-{% endfor %}
-</tbody> -->
+<script>
+
+function refreshScheduled() {
+    loadEmailTable(
+        "http://127.0.0.1:8000/emails/scheduled",
+        "scheduled-table",
+        "warning",
+        "Scheduled"
+    );
+
+}
+refreshScheduled();
+setInterval(refreshScheduled, 5000);
+
+</script>
+
+{% endblock %}

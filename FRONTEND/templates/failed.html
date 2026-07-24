@@ -29,7 +29,7 @@ Failed Emails
 
                 <div class="card-header">
                     <h3 class="card-title">
-                        Scheduled Emails
+                        Failed Emails
                     </h3>
                 </div>
 
@@ -43,44 +43,11 @@ Failed Emails
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Status</th>
+                                <th>Error</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td><span class="badge bg-warning">Failed</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>2</td>
-                                <td>hr@google.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                               <td><span class="badge bg-warning">Failed</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>3</td>
-                                <td>olive@gmail.com</td>
-                                <td>Interview Invitation</td>
-                                <td>14-07-2026</td>
-                                <td>10:30 AM</td>
-                                <td><span class="badge bg-warning">Failed</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>4</td>
-                                <td>hr@microsoft.com</td>
-                                <td>Offer Letter</td>
-                                <td>15-07-2026</td>
-                                <td>09:00 AM</td>
-                                <td><span class="badge bg-warning">Failed</span></td>
-                            </tr>
+                        <tbody id="failed-table">
+                            
                         </tbody>
                     </table>
                 </div>        
@@ -88,5 +55,29 @@ Failed Emails
           </div>
         </div>
       </main>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/email_table.js') }}"></script>
+
+<script>
+    
+function refreshFailed() {
+    loadEmailTable(
+        "http://127.0.0.1:8000/emails/failed",
+        "failed-table",
+        "danger",
+        "Failed",
+        true
+    );
+
+}
+refreshFailed();
+setInterval(refreshFailed,5000);
+
+</script>
 
 {% endblock %}
