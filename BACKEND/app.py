@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 from smtp import send_email
 
 from models import (
@@ -170,6 +171,7 @@ def store_templates(template_data: TemplateRequest):
         "message": "Templates saved successfully"
     }
 
+
 @app.get("/templates/search")
 def search_template(keyword: str):
 
@@ -191,11 +193,13 @@ def get_stored_templates(id: int):
         "last_edited": get_template[4]
     }
 
+
 @app.get("/templates")
 def get_templates():
 
     templates = get_all_templates()
     return templates
+
 
 @app.delete("/templates/{id}")
 def remove_template(id: int):
@@ -206,6 +210,7 @@ def remove_template(id: int):
         "message": "Template deleted successfully"
     }
 
+
 @app.put("/templates/{id}")
 def edit_template(id: int, template_data: TemplateRequest):
 
@@ -214,6 +219,88 @@ def edit_template(id: int, template_data: TemplateRequest):
     return {
         "message": "Template updated successfully"
     }
+
+
+@app.get("/calendar/events")
+def calendar_events():
+
+    pending = get_pending_emails()
+    sent = get_sent_emails()
+    failed = get_failed_emails()
+
+    events = []
+
+    # 0 → id
+    # 1 → recipient
+    # 2 → subject
+    # 3 → message
+    # 4 → date
+    # 5 → time
+    # 6 → status
+    # 7 → error
+
+    # Pending Emails (Yellow)
+    for email in pending:
+
+        dt = datetime.strptime(
+            f"{email[4]} {email[5]}",
+            "%d-%m-%Y %H:%M"
+        )
+
+        events.append({
+            "title": email[2],
+            "start": dt.isoformat(),     #converts datetime object to ISO format for FullCalendar to use
+
+            "backgroundColor": "#ffc107",
+            "borderColor": "#ffc107",
+            "textColor": "#000000",
+
+            "recipient": email[1],
+            "status": email[6],
+            "error": email[7]
+        })
+
+    # Sent Emails (Green)
+    for email in sent:
+
+        dt = datetime.strptime(
+            f"{email[4]} {email[5]}",
+            "%d-%m-%Y %H:%M"
+        )
+
+        events.append({
+            "title": email[2],
+            "start": dt.isoformat(),
+
+            "backgroundColor": "#198754",
+            "borderColor": "#198754",
+
+            "recipient": email[1],
+            "status": email[6],
+            "error": email[7]
+        })
+
+    # Failed Emails (Red)
+    for email in failed:
+
+        dt = datetime.strptime(
+            f"{email[4]} {email[5]}",
+            "%d-%m-%Y %H:%M"
+        )
+
+        events.append({
+            "title": email[2],
+            "start": dt.isoformat(),
+
+            "backgroundColor": "#dc3545",
+            "borderColor": "#dc3545",
+
+            "recipient": email[1],
+            "status": email[6],
+            "error": email[7]
+        })
+
+    return events
 
 
 @app.post("/smtp_settings")

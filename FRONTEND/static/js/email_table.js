@@ -37,7 +37,7 @@ async function loadEmailTable(endpoint, tableId, badgeColor, badgeText, showErro
                 <td>${email.date}</td>
                 <td>${email.time}</td>
                 <td>
-                    <span class="badge bg-${badgeColor}">
+                    <span class="badge bg-${badgeColor} text-dark">
                         ${badgeText}
                     </span>
                 </td>
@@ -68,7 +68,7 @@ async function loadDashboardTable(endpoint, tableId, badgeColor, badgeText) {
                 <td>${email.date}</td>
                 <td>${email.time}</td>
                 <td>
-                    <span class="badge bg-${badgeColor}">
+                    <span class="badge bg-${badgeColor} text-dark">
                         ${badgeText}
                     </span>
                 </td>

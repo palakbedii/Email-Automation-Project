@@ -79,7 +79,7 @@ def get_pending_emails():
         """
         SELECT *
         FROM emails
-        WHERE status='Scheduled'
+        WHERE status='Pending'
         ORDER BY id DESC
         """
     )
@@ -328,6 +328,7 @@ def get_totalemails_count():
 
 
 def scheduled_emails_count():
+    
     conn = sqlite3.connect("emails.db")
     cursor = conn.cursor()
 

@@ -1,0 +1,107 @@
+.badge{
+    background-color: #2b2b2b;
+    color: rgb(233, 229, 229);
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+#calendar {
+
+    background: #212529;
+    color: white;
+    border-radius: 10px;
+    padding: 15px;
+
+}
+
+
+/* Calendar header title */
+.fc-toolbar-title {
+
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+
+}
+
+
+/* Buttons */
+.fc-button {
+
+    background-color: #343a40 !important;
+    border-color: #495057 !important;
+    color: white !important;
+
+}
+
+
+.fc-button:hover {
+
+    background-color: #495057 !important;
+
+}
+
+
+/* Day names row */
+.fc-col-header-cell {
+
+    background-color: #212529 !important;
+    color: #adb5bd;
+
+}
+
+
+/* Calendar cells */
+
+.fc-daygrid-day {
+
+    background-color: #212529;
+
+}
+
+
+.fc-daygrid-day-number {
+
+    color: #dee2e6;
+
+}
+
+
+/* Grid lines */
+
+.fc-scrollgrid,
+.fc-scrollgrid td,
+.fc-scrollgrid th {
+
+    border-color: #495057 !important;
+
+}
+
+
+/* Today highlight */
+
+.fc-day-today {
+
+    background-color: rgba(13,110,253,0.15) !important;
+
+}
+
+
+/* Events */
+
+.fc-event {
+
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 0.85rem;
+    border: none;
+
+}
+
+
+.fc-event-title {
+
+    font-weight: 500;
+
+}
