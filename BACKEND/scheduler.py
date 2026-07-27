@@ -1,5 +1,6 @@
 import time
 from datetime import datetime
+import json
 
 from database import (
     get_pending_emails,
@@ -29,6 +30,7 @@ def scheduler():
             message = email[3]
             date = email[4]
             scheduled_time = email[5]
+            attachments = json.loads(email[8]) if email[8] else []
             print("-------------------------")
             print("Database Date :", date)
             print("Database Time :", scheduled_time)
@@ -39,18 +41,15 @@ def scheduler():
             
             if  current_datetime >= scheduled_datetime:
                 try:
-                    send_email(recipient, subject, message)
 
+                    send_email(recipient, subject, message, attachments)
                     update_status(email_id, "Sent", None)
-
                     print("Email Sent Successfully")
 
                 except Exception as e:
 
                     print("SMTP Error:", e)
-
                     update_status(email_id, "Failed", str(e))
-
                     print("Email Sending Failed")
                 
         time.sleep(60)

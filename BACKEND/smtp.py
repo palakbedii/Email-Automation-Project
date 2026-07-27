@@ -1,10 +1,14 @@
 import smtplib
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+import os
 from security import decrypt
 import database
 
 
-def send_email(recipient, subject, message):
+def send_email(recipient, subject, message, attachments=None):
 
     # Get SMTP settings from database
     settings = database.get_smtp_settings()
@@ -28,10 +32,39 @@ def send_email(recipient, subject, message):
     password = decrypt(encrypted_password)
 
     # Create email
-    msg = MIMEText(message)
+    msg = MIMEMultipart()
+
     msg["Subject"] = subject
     msg["From"] = sender
     msg["To"] = recipient
+    
+    msg.attach(MIMEText(message, "plain"))
+
+    if attachments:
+        print("Attachments:", attachments)
+
+        for path in attachments:
+            path = os.path.abspath(path)
+
+            print("Absolute Path:", path)
+            print("Exists:", os.path.exists(path))
+
+            if os.path.exists(path):
+                print("Attaching File:", path)
+                with open(path, "rb") as file:
+                    part = MIMEBase("application", "octet-stream")
+                    part.set_payload(file.read())
+
+                encoders.encode_base64(part)
+                part.add_header(
+                    "Content-Disposition",
+                    f'attachment; filename="{os.path.basename(path)}"'
+                )
+                msg.attach(part)
+                print("Attachment added!")
+
+            else:
+                print("File NOT found!")
 
     try:
 

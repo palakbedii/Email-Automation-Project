@@ -1,4 +1,5 @@
 import sqlite3
+import json
 from datetime import datetime
 from security import encrypt
 
@@ -16,7 +17,8 @@ def create_email_table():
         date TEXT,
         time TEXT,
         status TEXT,
-        error TEXT
+        error TEXT,
+        attachments TEXT
     )
     """)
 
@@ -29,8 +31,8 @@ def send_to_sql(data):
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO emails(recipient, subject, message, date, time, status)
-    VALUES(?,?,?,?,?,?)
+    INSERT INTO emails(recipient, subject, message, date, time, status, attachments)
+    VALUES(?,?,?,?,?,?,?)
     """,
     (
         data.recipient,
@@ -38,7 +40,8 @@ def send_to_sql(data):
         data.message,
         data.date.strftime("%d-%m-%Y"),
         data.time.strftime("%H:%M"),
-        "Pending"
+        "Pending",
+        json.dumps(data.attachments)
     ))
 
     print("Email saved successfully!")
@@ -54,8 +57,8 @@ def save_email(data, status, error=None):
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO emails(recipient, subject, message, date, time, status, error)
-    VALUES(?,?,?,?,?,?,?)
+    INSERT INTO emails(recipient, subject, message, date, time, status, error, attachments)
+    VALUES(?,?,?,?,?,?,?,?)
     """, (
         data.recipient,
         data.subject,
@@ -63,7 +66,8 @@ def save_email(data, status, error=None):
         datetime.now().strftime("%d-%m-%Y"),
         datetime.now().strftime("%H:%M"),
         status,
-        error
+        error,
+        json.dumps(data.attachments)
         )
     )
 
@@ -116,7 +120,8 @@ def email_to_dict(email):
         "date": email[4],
         "time": email[5],
         "status": email[6],
-        "error": email[7]
+        "error": email[7],
+        "attachments": json.loads(email[8]) if email[8] else []
     }
 
 def store_to_sql(template_data):

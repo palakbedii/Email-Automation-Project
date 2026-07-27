@@ -69,7 +69,8 @@ def send_now(data: SendNowRequest):
         send_email(
             data.recipient,
             data.subject,
-            data.message
+            data.message,
+            data.attachments,
         )
 
         save_email(
@@ -238,6 +239,7 @@ def calendar_events():
     # 5 → time
     # 6 → status
     # 7 → error
+    # 8 → attachments  
 
     # Pending Emails (Yellow)
     for email in pending:

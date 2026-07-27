@@ -45,7 +45,8 @@ Compose Mail
                 <form
                   class="row g-3"
                   method="POST"
-                  action="{{ url_for('compose') }}">
+                  action="{{ url_for('compose') }}"
+                  enctype="multipart/form-data">
                   <div class="col-12">
                     <label class="form-label" for="mail-to">To</label>
                     <input
@@ -126,9 +127,11 @@ Compose Mail
                       style="min-height: 16rem"
                     >{{ selected_template.body if selected_template else '' }}</textarea>
                   </div>
+                  
                   <div class="col-12">
-                    <label class="form-label" for="mail-attach">Attachments</label>
-                    <input type="file" class="form-control" id="mail-attach" multiple />
+                    <label class="form-label" for="mail-attach">Attachments</label><br>
+                    <input type="checkbox" id="checkbox" name="checkbox"> Attach latest report from Reports folder
+                    <input type="file" class="form-control" id="mail-attach" name="attachments" multiple />
                   </div>
 
               </div>
@@ -151,6 +154,26 @@ Compose Mail
                           name="time"
                           required />
                   </div>
+                  <div class="col-md-5 pe-2">
+                        <label>Repeat Interval</label>                    
+                        <select class="form-select" 
+                                name="repeat_interval">
+                                <option value="" selected disabled>
+                                    Select Interval
+                                </option>                    
+                                <option value="Never">Never</option>
+                                <option value="Hourly">Hourly</option>
+                                <option value="Daily">Daily</option>
+                        </select>
+                   </div>
+                  <div class="col-md-5 pe-2">
+                      <label>End Date (If Repeat Interval Selected)</label>
+                      <input
+                          type="date"
+                          id="end-date"
+                          class="form-control"
+                          name="end-date" />
+                  </div>                              
               </div>              
               <div class="d-flex justify-content-center gap-3 mt-4">
                   <button

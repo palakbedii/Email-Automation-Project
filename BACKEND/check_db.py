@@ -7,9 +7,7 @@ conn = sqlite3.connect("emails.db")
 cursor = conn.cursor()
 
 cursor.execute("""
-SELECT id, subject, recipient, date, time, status
-FROM emails
-WHERE subject = 'Game';
+ALTER TABLE emails ADD Column attachments TEXT;
 """)
 
 rows = cursor.fetchall()
@@ -18,7 +16,7 @@ for row in rows:
     print(row)
 
 conn.close()
-
+print("Added successfully!")
 
 # import sqlite3
 

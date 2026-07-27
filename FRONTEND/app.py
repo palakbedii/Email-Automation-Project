@@ -2,10 +2,19 @@ from flask import Flask, render_template, redirect, request, flash, url_for
 from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
 import requests
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "email_automation_project"
 
+#CREATES UPLOAD FOLDER FOR ATTACHMENTS
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(
+    BASE_DIR,
+    "uploads"
+)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/")
 def dashboard():
@@ -158,6 +167,21 @@ def send_now():
     subject = request.form["subject"].strip()
     message = request.form["message"].strip()
 
+    files = request.files.getlist("attachments")
+
+    saved_files = []
+
+    for file in files:
+        if file.filename:
+            filename = secure_filename(file.filename)
+            
+            path = os.path.join(
+                UPLOAD_FOLDER,
+                filename
+            )
+            file.save(path)
+            saved_files.append(path)
+
     # 1. Check recipient empty
     if not recipient:
         flash(
@@ -198,6 +222,7 @@ def send_now():
         "recipient": recipient,
         "subject": subject,
         "message": message,
+        "attachments": saved_files,
     }
 
     response = requests.post(
@@ -231,12 +256,33 @@ def compose():
         print("===== COMPOSE FORM SUBMITTED =====")
         print(request.form)
 
+        files = request.files.getlist("attachments")
+
+        saved_files = []
+
+        for file in files:
+
+            if file.filename:
+
+                filename = secure_filename(file.filename)
+
+                path = os.path.join(
+                    UPLOAD_FOLDER,
+                    filename
+                )
+
+                file.save(path)
+
+                saved_files.append(path)
+
         data = {
             "recipient": request.form["recipient"],
             "subject": request.form["subject"],
             "message": request.form["message"],
             "date": request.form["date"],
-            "time": request.form["time"]
+            "time": request.form["time"],
+            "attachments": saved_files
+
         }
 
         response = requests.post(

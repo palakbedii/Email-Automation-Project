@@ -1,5 +1,6 @@
 from datetime import date, time
 from pydantic import BaseModel, EmailStr, Field
+from typing import List
 
 # For Scheduling Email
 class EmailRequest(BaseModel):
@@ -8,6 +9,7 @@ class EmailRequest(BaseModel):
     message: str
     date: date
     time: time
+    attachments: List[str] = []
 
 # For Sending Email Now
 class SendNowRequest(BaseModel):
@@ -19,7 +21,8 @@ class SendNowRequest(BaseModel):
     message: str = Field(
         min_length=1,
         description="Email message cannot be empty"
-    )  
+    )
+    attachments: List[str] = []     
 
 class TemplateRequest(BaseModel):
     name: str
