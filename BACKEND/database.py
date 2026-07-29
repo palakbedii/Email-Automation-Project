@@ -15,12 +15,21 @@ def create_email_table():
         subject TEXT,
         message TEXT,
         date TEXT,
+        end_date TEXT,
         time TEXT,
         status TEXT,
         error TEXT,
-        attachments TEXT
+        attachments TEXT,
+        repeat_interval TEXT,
+        max_occurrences INTEGER,
+        occurrence_count INTEGER,
     )
     """)
+        # attach_document INTEGER,
+        # attachment_path TEXT,
+        # attachment_filename TEXT,
+        # attachment_status TEXT,
+        # start_date TEXT,
 
     conn.commit()
     conn.close()
