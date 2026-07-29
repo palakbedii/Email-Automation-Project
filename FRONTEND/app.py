@@ -261,18 +261,15 @@ def compose():
         saved_files = []
 
         for file in files:
-
             if file.filename:
-
                 filename = secure_filename(file.filename)
 
                 path = os.path.join(
                     UPLOAD_FOLDER,
                     filename
                 )
-
+                
                 file.save(path)
-
                 saved_files.append(path)
 
         data = {
@@ -280,9 +277,19 @@ def compose():
             "subject": request.form["subject"],
             "message": request.form["message"],
             "date": request.form["date"],
+            "end_date": request.form.get("end_date") or None,
             "time": request.form["time"],
-            "attachments": saved_files
-
+            "attachments": saved_files,
+            "repeat_interval": request.form.get("repeat_interval"),
+            "attach_document": (
+                request.form.get("attach_document") == "on"
+            ),
+            # Removing this for now
+            # "max_occurrences": (
+            #     int(request.form["max_occurrences"])
+            #     if request.form.get("max_occurrences")
+            #     else None
+            # )
         }
 
         response = requests.post(

@@ -1,31 +1,15 @@
 import sqlite3
-import os
-
-print("Database:", os.path.abspath("emails.db"))
 
 conn = sqlite3.connect("emails.db")
 cursor = conn.cursor()
 
 cursor.execute("""
-ALTER TABLE emails ADD Column attachments TEXT;
+SELECT id, subject, date, time, status, repeat_interval, occurrence_count
+FROM emails
+ORDER BY id DESC
 """)
 
-rows = cursor.fetchall()
-
-for row in rows:
+for row in cursor.fetchall():
     print(row)
 
 conn.close()
-print("Added successfully!")
-
-# import sqlite3
-
-# conn = sqlite3.connect("emails.db")
-# cursor = conn.cursor()
-
-# cursor.execute("DELETE FROM emails WHERE id = ?", (15,))
-
-# conn.commit()
-# conn.close()
-
-# print("Deleted successfully!")

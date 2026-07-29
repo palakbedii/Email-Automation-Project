@@ -239,7 +239,15 @@ def calendar_events():
     # 5 → time
     # 6 → status
     # 7 → error
-    # 8 → attachments  
+    # 8 → attachments
+    # 9 → end_date
+    # 10 → repeat_interval
+    # 11 → attach_document
+    # 12 → attachment_path
+    # 13 → attachment_filename
+    # 14 → attachment_status
+    # 15 → max_occurrences
+    # 16 → occurrence_count
 
     # Pending Emails (Yellow)
     for email in pending:

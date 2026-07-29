@@ -21,40 +21,161 @@ def create_email_table():
         error TEXT,
         attachments TEXT,
         repeat_interval TEXT,
+        attach_document INTEGER,
+        attachment_path TEXT,
+        attachment_filename TEXT,
+        attachment_status TEXT,
         max_occurrences INTEGER,
-        occurrence_count INTEGER,
+        occurrence_count INTEGER DEFAULT 1
     )
     """)
-        # attach_document INTEGER,
-        # attachment_path TEXT,
-        # attachment_filename TEXT,
-        # attachment_status TEXT,
-        # start_date TEXT,
 
     conn.commit()
     conn.close()
 
-def send_to_sql(data):
+def send_to_sql(
+    data,
+    attachment_path=None,
+    attachment_filename=None,
+    attachment_status=None
+):
 
     conn = sqlite3.connect("emails.db")
     cursor = conn.cursor()
 
     cursor.execute("""
-    INSERT INTO emails(recipient, subject, message, date, time, status, attachments)
-    VALUES(?,?,?,?,?,?,?)
+    INSERT INTO emails(
+        recipient,
+        subject,
+        message,
+        date,
+        end_date,
+        time,
+        status,
+        attachments,
+        repeat_interval,
+        attach_document,
+        attachment_path,
+        attachment_filename,
+        attachment_status,
+        max_occurrences,
+        occurrence_count
+    )
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """,
     (
         data.recipient,
         data.subject,
         data.message,
         data.date.strftime("%d-%m-%Y"),
+        data.end_date.strftime("%d-%m-%Y")
+        if data.end_date else None,
         data.time.strftime("%H:%M"),
         "Pending",
-        json.dumps(data.attachments)
+        json.dumps(data.attachments),
+        data.repeat_interval,
+        int(getattr(data, "attach_document", False)),
+        attachment_path,
+        attachment_filename,
+        attachment_status,
+        data.max_occurrences,
+        1
     ))
 
     print("Email saved successfully!")
     print(data)
+
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
+    return new_id
+
+
+    # Creates the next recurring row.
+    # `next_date` / `next_time` MUST already be the correctly
+    # calculated next occurrence (current scheduled time + interval),
+    # computed by the caller (scheduler). This function does not
+    # do any date math itself.
+
+    # `next_occurrence_count` carries forward how many times this
+    # chain has now sent (including the one just sent), so the
+    # scheduler can compare it against max_occurrences on the next
+    # row too.
+
+def create_next_recurring_email(
+    email,
+    next_date,
+    next_time,
+    next_occurrence_count
+):
+    
+    conn = sqlite3.connect("emails.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO emails(
+        recipient,
+        subject,
+        message,
+        date,
+        end_date,
+        time,
+        status,
+        error,
+        attachments,
+        repeat_interval,
+        attach_document,
+        attachment_path,
+        attachment_filename,
+        attachment_status,
+        max_occurrences,
+        occurrence_count
+    )
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    """,
+    (
+        email[1],      # recipient
+        email[2],      # subject
+        email[3],      # message
+        next_date,     # new date
+        email[9],      # end_date
+        next_time,     # new time
+        "Pending",     # new status
+        None,          # error
+        email[8],      # attachments
+        email[10],     # repeat_interval
+        email[11],     # attach_document
+        email[12],     # attachment_path
+        email[13],     # attachment_filename
+        email[14],     # attachment_status
+        email[15],     # max_occurrences
+        next_occurrence_count
+    ))
+
+    new_id = cursor.lastrowid
+
+    conn.commit()
+    conn.close()
+
+    return new_id
+
+
+def update_attachment_details(
+    email_id,
+    attachment_path,
+    attachment_filename,
+    attachment_status
+):
+
+    conn = sqlite3.connect("emails.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE emails
+    SET attachment_path=?, attachment_filename=?, attachment_status=?
+    WHERE id=?
+    """,
+    (attachment_path, attachment_filename, attachment_status, email_id))
 
     conn.commit()
     conn.close()
@@ -121,6 +242,24 @@ def update_status(email_id, status, error=None):
 
 def email_to_dict(email):
 
+    # 0 → id
+    # 1 → recipient
+    # 2 → subject
+    # 3 → message
+    # 4 → date
+    # 5 → time
+    # 6 → status
+    # 7 → error
+    # 8 → attachments
+    # 9 → end_date
+    # 10 → repeat_interval
+    # 11 → attach_document
+    # 12 → attachment_path
+    # 13 → attachment_filename
+    # 14 → attachment_status
+    # 15 → max_occurrences
+    # 16 → occurrence_count
+
     return {
         "id": email[0],
         "recipient": email[1],
@@ -130,7 +269,15 @@ def email_to_dict(email):
         "time": email[5],
         "status": email[6],
         "error": email[7],
-        "attachments": json.loads(email[8]) if email[8] else []
+        "attachments": json.loads(email[8]) if email[8] else [],
+        "end_date": email[9],
+        "repeat_interval": email[10],
+        "attach_document": email[11],
+        "attachment_path": email[12],
+        "attachment_filename": email[13],
+        "attachment_status": email[14],
+        "max_occurrences": email[15],
+        "occurrence_count": email[16]
     }
 
 def store_to_sql(template_data):

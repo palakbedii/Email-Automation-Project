@@ -130,8 +130,38 @@ Compose Mail
                   
                   <div class="col-12">
                     <label class="form-label" for="mail-attach">Attachments</label><br>
-                    <input type="checkbox" id="checkbox" name="checkbox"> Attach latest report from Reports folder
-                    <input type="file" class="form-control" id="mail-attach" name="attachments" multiple />
+                    <div class="form-check mb-2">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="attach_document"
+                            name="attach_document">
+                        <label
+                            class="form-check-label"
+                            for="attach_document">
+
+                            Attach latest report from Reports folder
+
+                        </label>
+                    </div>
+
+                    <div id="attachment-upload">
+                        <input
+                            type="file"
+                            class="form-control"
+                            id="mail-attach"
+                            name="attachments"
+                            multiple>
+                    </div>
+
+                    <div
+                        id="auto-report-msg"
+                        class="alert alert-success py-2 mt-2"
+                        style="display:none">
+
+                        📁 Latest report will be attached automatically from the Reports folder.
+
+                    </div>
                   </div>
 
               </div>
@@ -158,21 +188,23 @@ Compose Mail
                         <label>Repeat Interval</label>                    
                         <select class="form-select" 
                                 name="repeat_interval">
-                                <option value="" selected disabled>
-                                    Select Interval
-                                </option>                    
-                                <option value="Never">Never</option>
+                                <option value="Never" selected>
+                                    Never
+                                </option>
                                 <option value="Hourly">Hourly</option>
                                 <option value="Daily">Daily</option>
+                                <option value="Weekly">Weekly</option>
                         </select>
                    </div>
-                  <div class="col-md-5 pe-2">
+                  <div
+                    class="col-md-5 pe-2"
+                    id="end-date-div">
                       <label>End Date (If Repeat Interval Selected)</label>
                       <input
                           type="date"
                           id="end-date"
                           class="form-control"
-                          name="end-date" />
+                          name="end_date" />
                   </div>                              
               </div>              
               <div class="d-flex justify-content-center gap-3 mt-4">
@@ -351,6 +383,51 @@ document.getElementById("send-now").addEventListener("click", function () {
 document.getElementById("schedule-btn").addEventListener("click", function () {
     dateInput.required = true;
     timeInput.required = true;
+});
+
+//attachment
+const reportCheckbox =
+    document.getElementById("attach_document");
+
+const uploadDiv =
+    document.getElementById("attachment-upload");
+
+const msg =
+    document.getElementById("auto-report-msg");
+
+reportCheckbox.addEventListener("change", function(){
+
+    if(this.checked){
+        uploadDiv.style.display = "none";
+        msg.style.display = "block";
+    }
+
+    else{
+        uploadDiv.style.display = "block";
+        msg.style.display = "none";
+    }
+
+});
+
+
+const repeat =
+document.querySelector("[name='repeat_interval']");
+
+const endDateDiv =
+document.getElementById("end-date-div");
+
+endDateDiv.style.display = "none";
+
+repeat.addEventListener("change", function(){
+
+    if(this.value=="Never"){
+        endDateDiv.style.display="none";
+    }
+
+    else{
+        endDateDiv.style.display="block";
+    }
+
 });
 
 </script>
