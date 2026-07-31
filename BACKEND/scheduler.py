@@ -1,15 +1,25 @@
 import time
 from datetime import datetime, timedelta
 import json
+from pathlib import Path
 
 from database import (
     get_pending_emails,
     update_status,
+    update_attachment_details,
     create_next_recurring_email
+)
+
+from attachment_manager import (
+    get_automatic_attachment,
+    resolve_next_attachment,
+    archive_file
 )
 
 from smtp import send_email
 
+
+BASE_DIR = Path(__file__).parent
 
 def scheduler():
     print("Scheduler Started")
@@ -40,6 +50,8 @@ def scheduler():
             attachment_path = email[12]
             attachment_filename = email[13]
             attachment_status = email[14]
+            actual_attachment_path = None
+            next_attachment_before_archive = None
             max_occurrences = email[15]
             occurrence_count = email[16]
 
@@ -54,9 +66,40 @@ def scheduler():
             if  current_datetime >= scheduled_datetime:
                 try:
 
+                    # Automatic Report Attachment
+                    if attach_document:
+
+                        if attachment_path:
+                            actual_attachment_path = BASE_DIR / attachment_path
+
+                        else:
+                            automatic_report = get_automatic_attachment()
+                            print("Automatic report:",automatic_report)
+
+                            if automatic_report:
+                                actual_attachment_path = automatic_report
+
+                        if actual_attachment_path:
+                            attachments.append(actual_attachment_path)
+                            print("Attachments being sent:", attachments)
+
                     send_email(recipient, subject, message, attachments)
                     update_status(email_id, "Sent", None)
                     print("Email Sent Successfully")
+
+                    if attach_document and actual_attachment_path:
+                        next_attachment_before_archive = resolve_next_attachment(
+                            Path(actual_attachment_path).name
+                        )
+                                
+                    if attach_document and actual_attachment_path:
+                        update_attachment_details(
+                            email_id,
+                            str(actual_attachment_path),
+                            Path(actual_attachment_path).name,
+                            "Automatic" if not attachment_filename else attachment_status
+                        )
+                        archive_file(Path(actual_attachment_path))
 
                     # RECURRING EMAIL LOGIC
                     if repeat_interval and repeat_interval != "Never":
@@ -90,15 +133,29 @@ def scheduler():
                                 if next_datetime > end_datetime:
                                     print("Repeat stopped: End date reached")
                                     continue
-
-
+    
                             # Create next pending email
-                            new_email_id = create_next_recurring_email(
-                                email,
-                                next_datetime.strftime("%d-%m-%Y"),
-                                next_datetime.strftime("%H:%M"),
-                                occurrence_count + 1
-                            )
+                            if next_attachment_before_archive:
+                                new_email_id = create_next_recurring_email(
+                                    email,
+                                    str(next_attachment_before_archive),
+                                    next_attachment_before_archive.name,
+                                    "Automatic",
+                                    next_datetime.strftime("%d-%m-%Y"),
+                                    next_datetime.strftime("%H:%M"),
+                                    occurrence_count + 1
+                                )
+
+                            else:
+                                new_email_id = create_next_recurring_email(
+                                    email,
+                                    None,
+                                    None,
+                                    None,
+                                    next_datetime.strftime("%d-%m-%Y"),
+                                    next_datetime.strftime("%H:%M"),
+                                    occurrence_count + 1
+                                )
                             print(
                                 "Next recurring email created. ID:",
                                 new_email_id

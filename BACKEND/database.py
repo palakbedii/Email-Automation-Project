@@ -91,23 +91,27 @@ def send_to_sql(
     return new_id
 
 
-    # Creates the next recurring row.
-    # `next_date` / `next_time` MUST already be the correctly
-    # calculated next occurrence (current scheduled time + interval),
-    # computed by the caller (scheduler). This function does not
-    # do any date math itself.
-
-    # `next_occurrence_count` carries forward how many times this
-    # chain has now sent (including the one just sent), so the
-    # scheduler can compare it against max_occurrences on the next
-    # row too.
-
 def create_next_recurring_email(
     email,
+    next_attachment_path,
+    next_attachment_filename,
+    next_attachment_status,
     next_date,
     next_time,
     next_occurrence_count
 ):
+    """
+    Creates the next recurring row.
+    `next_date` / `next_time` MUST already be the correctly
+    calculated next occurrence (current scheduled time + interval),
+    computed by the caller (scheduler). This function does not
+    do any date math itself.
+
+    `next_occurrence_count` carries forward how many times this
+    chain has now sent (including the one just sent), so the
+    scheduler can compare it against max_occurrences on the next
+    row too.
+    """
     
     conn = sqlite3.connect("emails.db")
     cursor = conn.cursor()
@@ -145,9 +149,9 @@ def create_next_recurring_email(
         email[8],      # attachments
         email[10],     # repeat_interval
         email[11],     # attach_document
-        email[12],     # attachment_path
-        email[13],     # attachment_filename
-        email[14],     # attachment_status
+        next_attachment_path,
+        next_attachment_filename,
+        next_attachment_status,
         email[15],     # max_occurrences
         next_occurrence_count
     ))
