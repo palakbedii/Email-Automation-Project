@@ -5,235 +5,237 @@ Compose Mail
 {% endblock %}
 
 {% block content %}
-
-        <div class="app-content-header">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-sm-6">
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
                 <h3 class="mb-0">Compose Message</h3>
-              </div>
-              <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-end">
-                  <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
-                  <li class="breadcrumb-item">
-                    <a href="#">Mailbox</a>
-                  </li>
-                  <li class="breadcrumb-item active" aria-current="page">Compose</li>
-                </ol>
-              </div>
             </div>
-          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('dashboard') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="#">Mailbox</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Compose</li>
+                </ol>
+            </div>
         </div>
-        <div class="app-content">
-          <div class="container-fluid">
-            <div class="card">
-              <div class="card-header">
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
                 <h3 class="card-title">New Message</h3>
-              </div>
-              <div class="card-body">
+            </div>
+            <div class="card-body">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-
                             <div class="alert alert-{{ category }}">
                                 {{ message }}
                             </div>
-
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
+
                 <form
-                  class="row g-3"
-                  method="POST"
-                  action="{{ url_for('compose') }}"
-                  enctype="multipart/form-data">
-                  <div class="col-12">
-                    <label class="form-label" for="mail-to">To</label>
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="mail-to"
-                      name="recipient"
-                      placeholder="recipient@example.com"
-                      required
-                    />
-                  </div>
-
-                <div class="col-12">
-
-                    <label class="form-label">
-                        Email Template
-                    </label>
-
-
-                    <select 
-                        class="form-select" 
-                        id="template"
-                        name="template">
-
-                        <option value="" selected disabled>
-                            Select Template
-                        </option>
-
-
-                        {% for template in templates %}
-
-                            <option value="{{ template.name }}">
-                                Template {{ template.id }}: {{ template.name }}
-                            </option>
-
-                        {% endfor %}
-
-
-                    </select>
-
-                </div>
-
-                  <div class="col-12">
-
-                      <div id="template-fields"></div>
-
-                  </div>
-
-                  <div class="col-12">
-
-                    <button
-                        type="button"
-                        class="btn btn-info"
-                        id="generate-email">
-                        Generate Email
-                    </button>
-
-                  </div>                  
-
-                  <div class="col-12">
-                    <label class="form-label" for="mail-subject">Subject</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="mail-subject"
-                        name="subject"
-                        value="{{ selected_template.subject if selected_template else '' }}"
-                    />
-                  </div>
-                  <div class="col-12">
-                    <label class="form-label" for="mail-body">Message</label>
-                    <textarea
-                      id="mail-body"
-                      name="message"
-                      class="form-control"
-                      rows="12"
-                      placeholder="Write your message…"
-                      style="min-height: 16rem"
-                    >{{ selected_template.body if selected_template else '' }}</textarea>
-                  </div>
-                  
-                  <div class="col-12">
-                    <label class="form-label" for="mail-attach">Attachments</label><br>
-                    <div class="form-check mb-2">
+                    class="row g-3"
+                    method="POST"
+                    action="{{ url_for('compose') }}"
+                    enctype="multipart/form-data"
+                >
+                    <div class="col-12">
+                        <label class="form-label" for="mail-to">To</label>
                         <input
-                            class="form-check-input"
-                            type="checkbox"
-                            id="attach_document"
-                            name="attach_document">
-                        <label
-                            class="form-check-label"
-                            for="attach_document">
-
-                            Attach latest report from Reports folder
-
-                        </label>
-                    </div>
-
-                    <div id="attachment-upload">
-                        <input
-                            type="file"
+                            type="email"
                             class="form-control"
-                            id="mail-attach"
-                            name="attachments"
-                            multiple>
+                            id="mail-to"
+                            name="recipient"
+                            placeholder="recipient@example.com"
+                            required
+                        />
                     </div>
 
-                    <div
-                        id="auto-report-msg"
-                        class="alert alert-success py-2 mt-2"
-                        style="display:none">
-
-                        📁 Latest report will be attached automatically from the Reports folder.
-
-                    </div>
-                  </div>
-
-              </div>
-              <div class="d-flex justify-content-center row gap-3 mt-3">
-                  <div class="col-md-5 pe-2">
-                      <label>Schedule Date</label>
-                      <input
-                          type="date"
-                          id="schedule-date"
-                          class="form-control"
-                          name="date"
-                          required />
-                  </div>
-                  <div class="col-md-5 pe-2">
-                      <label>Schedule Time</label>
-                      <input
-                          type="time"
-                          id="schedule-time"
-                          class="form-control"
-                          name="time"
-                          required />
-                  </div>
-                  <div class="col-md-5 pe-2">
-                        <label>Repeat Interval</label>                    
-                        <select class="form-select" 
-                                name="repeat_interval">
-                                <option value="Never" selected>
-                                    Never
+                    <div class="col-12">
+                        <label class="form-label">Email Template</label>
+                        <select
+                            class="form-select"
+                            id="template"
+                            name="template"
+                        >
+                            <option value="" selected disabled>
+                                Select Template
+                            </option>
+                            {% for template in templates %}
+                                <option value="{{ template.name }}">
+                                    Template {{ template.id }}: {{ template.name }}
                                 </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <div id="template-fields"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <button
+                            type="button"
+                            class="btn btn-info"
+                            id="generate-email"
+                        >
+                            Generate Email
+                        </button>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="mail-subject">Subject</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="mail-subject"
+                            name="subject"
+                            value="{{ selected_template.subject if selected_template else '' }}"
+                        />
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="mail-body">Message</label>
+                        <textarea
+                            id="mail-body"
+                            name="message"
+                            class="form-control"
+                            rows="12"
+                            placeholder="Write your message…"
+                            style="min-height: 16rem"
+                        >{{ selected_template.body if selected_template else '' }}</textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="mail-attach">Attachments</label><br>
+                        <div class="form-check mb-2">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="attach_document"
+                                name="attach_document"
+                            >
+                            <label class="form-check-label" for="attach_document">
+                                Attach latest report from Reports folder
+                            </label>
+                        </div>
+
+                        <div id="attachment-upload">
+                            <input
+                                type="file"
+                                class="form-control"
+                                id="mail-attach"
+                                name="attachments"
+                                multiple
+                            >
+                        </div>
+
+                        <div
+                            id="auto-report-msg"
+                            class="alert alert-success py-2 mt-2"
+                            style="display:none"
+                        >
+                            📁 Latest report will be attached automatically from the Reports folder.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center row gap-3 mt-3">
+                        <div class="col-md-5 pe-2">
+                            <label>Schedule Date</label>
+                            <input
+                                type="date"
+                                id="schedule-date"
+                                class="form-control"
+                                name="date"
+                                required
+                            />
+                        </div>
+
+                        <div class="col-md-5 pe-2">
+                            <label>Schedule Time</label>
+                            <input
+                                type="time"
+                                id="schedule-time"
+                                class="form-control"
+                                name="time"
+                                required
+                            />
+                        </div>
+
+                        <div class="col-md-5 pe-2">
+                            <label>Repeat Interval</label>
+                            <select
+                                class="form-select"
+                                id="repeat_interval"
+                                name="repeat_interval"
+                            >
+                                <option value="Never" selected>Never</option>
                                 <option value="Hourly">Hourly</option>
                                 <option value="Daily">Daily</option>
                                 <option value="Weekly">Weekly</option>
-                        </select>
-                   </div>
-                  <div
-                    class="col-md-5 pe-2"
-                    id="end-date-div">
-                      <label>End Date</label>
-                      <input
-                          type="date"
-                          id="end-date"
-                          class="form-control"
-                          name="end_date" />
-                  </div>                              
-              </div>              
-              <div class="d-flex justify-content-center gap-3 mt-4">
-                  <button
-                        type="submit"
-                        class="btn btn-secondary"
-                        id="send-now"
-                        formaction="{{ url_for('send_now') }}">
-                        Send Now
-                  </button>
-                  <button
-                        type="submit" 
-                        class="btn btn-primary"
-                        id="schedule-btn">
-                        Schedule Email
-                  </button>
-              </div><br>
-                </form>              
-            </div>
-          </div>
-        </div>
-      </main>
+                                <option value="Custom">Custom (Minutes)</option>
+                            </select>
 
+                            <input
+                                type="number"
+                                class="form-control mt-2"
+                                id="custom_interval"
+                                placeholder="Enter minutes (minimum 15)"
+                                min="15"
+                                style="display:none;"
+                            >
+                        </div>
+
+                        <div class="col-md-5 pe-2" id="end-date-div">
+                            <label>End Date</label>
+                            <input
+                                type="date"
+                                id="end-date"
+                                class="form-control"
+                                name="end_date"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <button
+                            type="submit"
+                            class="btn btn-secondary"
+                            id="send-now"
+                            formaction="{{ url_for('send_now') }}"
+                        >
+                            Send Now
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            id="schedule-btn"
+                        >
+                            Schedule Email
+                        </button>
+                    </div>
+
+                    <br>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-
 <script>
-
 const templates = {{ templates|tojson }};
 
 const dropdown = document.getElementById("template");
@@ -245,116 +247,72 @@ const generateBtn = document.getElementById("generate-email");
 let selectedTemplate = null;
 let fields = [];
 
-// When template is selected
-
-dropdown.addEventListener("change", function(){
-
-    selectedTemplate = templates.find(
-        t => t.name === this.value
-    );
+dropdown.addEventListener("change", function () {
+    selectedTemplate = templates.find(t => t.name === this.value);
 
     console.log("Selected Template:");
     console.log(selectedTemplate);
 
     fieldsDiv.innerHTML = "";
-
     fields = [];
 
-    // Extract {{variables}} from subject and body
-    
     {% raw %}
     const placeholders = [
         ...selectedTemplate.subject.matchAll(/{{(.*?)}}/g),
         ...selectedTemplate.body.matchAll(/{{(.*?)}}/g)
     ];
-
     {% endraw %}
 
     fields = [
         ...new Set(
-            placeholders.map(
-                item => item[1]
-            )
+            placeholders.map(item => item[1])
         )
     ];
 
     console.log("Detected Fields:");
     console.log(fields);
 
-
-    // Create input boxes
-
     fields.forEach(field => {
-
         fieldsDiv.innerHTML += `
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                ${field.toUpperCase()}
-            </label>
-
-
-            <input
-                type="text"
-                class="form-control"
-                id="${field}"
-                placeholder="Enter ${field}"
-            >
-
-        </div>
-
+            <div class="mb-3">
+                <label class="form-label">
+                    ${field.toUpperCase()}
+                </label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="${field}"
+                    placeholder="Enter ${field}"
+                >
+            </div>
         `;
-
     });
-
-
 });
 
-
-// Generate Email Button
-
-generateBtn.addEventListener("click", function(e){
-
+generateBtn.addEventListener("click", function (e) {
     e.preventDefault();
 
     console.log("Generate clicked");
 
-    if(!selectedTemplate){
-
+    if (!selectedTemplate) {
         alert("Please select a template first");
         return;
-
     }
 
     let generatedSubject = selectedTemplate.subject;
     let generatedBody = selectedTemplate.body;
 
     fields.forEach(field => {
-
-        const input =
-            document.getElementById(field);
-
-        const value =
-            input ? input.value : "";
+        const input = document.getElementById(field);
+        const value = input ? input.value : "";
 
         const placeholder = new RegExp(
             "\\{\\{\\s*" + field + "\\s*\\}\\}",
             "g"
         );
 
-        generatedSubject =
-            generatedSubject.replace(
-                placeholder,
-                value
-            );
-
-        generatedBody =
-            generatedBody.replace(
-                placeholder,
-                value
-            );
-
+        generatedSubject = generatedSubject.replace(placeholder, value);
+        generatedBody = generatedBody.replace(placeholder, value);
     });
 
     console.log("Generated Subject:");
@@ -363,14 +321,9 @@ generateBtn.addEventListener("click", function(e){
     console.log("Generated Body:");
     console.log(generatedBody);
 
-
-    // Fill email fields
-
     subject.value = generatedSubject;
     body.value = generatedBody;
-
 });
-
 
 const dateInput = document.getElementById("schedule-date");
 const timeInput = document.getElementById("schedule-time");
@@ -385,51 +338,65 @@ document.getElementById("schedule-btn").addEventListener("click", function () {
     timeInput.required = true;
 });
 
-//attachment
-const reportCheckbox =
-    document.getElementById("attach_document");
+// attachment
+const reportCheckbox = document.getElementById("attach_document");
+const uploadDiv = document.getElementById("attachment-upload");
+const msg = document.getElementById("auto-report-msg");
 
-const uploadDiv =
-    document.getElementById("attachment-upload");
-
-const msg =
-    document.getElementById("auto-report-msg");
-
-reportCheckbox.addEventListener("change", function(){
-
-    if(this.checked){
+reportCheckbox.addEventListener("change", function () {
+    if (this.checked) {
         uploadDiv.style.display = "none";
         msg.style.display = "block";
-    }
-
-    else{
+    } else {
         uploadDiv.style.display = "block";
         msg.style.display = "none";
     }
-
 });
 
-
-const repeat =
-document.querySelector("[name='repeat_interval']");
-
-const endDateDiv =
-document.getElementById("end-date-div");
+const repeat = document.querySelector("[name='repeat_interval']");
+const endDateDiv = document.getElementById("end-date-div");
 
 endDateDiv.style.display = "none";
 
-repeat.addEventListener("change", function(){
-
-    if(this.value=="Never"){
-        endDateDiv.style.display="none";
+repeat.addEventListener("change", function () {
+    if (this.value == "Never") {
+        endDateDiv.style.display = "none";
+    } else {
+        endDateDiv.style.display = "block";
     }
-
-    else{
-        endDateDiv.style.display="block";
-    }
-
 });
 
-</script>
+// Custom interval integration
+const repeatInterval = document.getElementById("repeat_interval");
+const customInterval = document.getElementById("custom_interval");
 
+// Show / hide custom interval input
+repeatInterval.addEventListener("change", function () {
+    if (this.value === "Custom") {
+        customInterval.style.display = "block";
+        customInterval.required = true;
+    } else {
+        customInterval.style.display = "none";
+        customInterval.required = false;
+        customInterval.value = "";
+    }
+});
+
+// Convert custom interval into backend supported format
+const composeForm = document.querySelector("form");
+
+composeForm.addEventListener("submit", function (event) {
+    if (repeatInterval.value === "Custom") {
+        const minutes = Number(customInterval.value);
+
+        if (!minutes || minutes < 15) {
+            event.preventDefault();
+            alert("Custom interval must be minimum 15 minutes.");
+            return;
+        }
+
+        repeatInterval.value = String(minutes);
+    }
+});
+</script>
 {% endblock %}
