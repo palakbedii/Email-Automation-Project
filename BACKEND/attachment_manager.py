@@ -4,6 +4,38 @@ BASE_DIR = Path(__file__).parent
 REPORTS_FOLDER = BASE_DIR / "Reports"
 ARCHIVE_FOLDER = BASE_DIR / "Archive"
 
+def resolve_attachment_path(attachment):
+    """
+    Resolves a manually attached file to its actual filesystem path.
+
+    Supports:
+    - Absolute paths
+    - Files already relative to BASE_DIR
+    - Files stored only by filename but physically located in Reports/
+    """
+
+    attachment_path = Path(attachment)
+
+    # 1. Already an absolute path
+    if attachment_path.is_absolute():
+        if attachment_path.exists():
+            return attachment_path
+
+        return None
+
+    # 2. Path relative to BACKEND
+    backend_path = BASE_DIR / attachment_path
+
+    if backend_path.exists():
+        return backend_path
+
+    # 3. Filename/path relative to Reports/
+    reports_path = REPORTS_FOLDER / attachment_path
+
+    if reports_path.exists():
+        return reports_path
+
+    return None
 def get_report_files_by_addition_order():
     """
     Returns files in the Reports folder ordered by the time they

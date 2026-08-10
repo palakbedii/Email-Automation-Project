@@ -28,6 +28,7 @@ from database import (
     scheduled_emails_count,
     sent_emails_count,
     failed_emails_count,
+    create_email_table,
     create_smtp_table,
     save_smtp_settings,
     get_smtp_settings
@@ -35,6 +36,7 @@ from database import (
 
 app = FastAPI()
 
+create_email_table()
 create_smtp_table()
 
 app.add_middleware(
@@ -236,11 +238,11 @@ def calendar_events():
     # 2 → subject
     # 3 → message
     # 4 → date
-    # 5 → time
-    # 6 → status
-    # 7 → error
-    # 8 → attachments
-    # 9 → end_date
+    # 5 → end_date
+    # 6 → time
+    # 7 → status
+    # 8 → error
+    # 9 → attachments
     # 10 → repeat_interval
     # 11 → attach_document
     # 12 → attachment_path
@@ -253,7 +255,7 @@ def calendar_events():
     for email in pending:
 
         dt = datetime.strptime(
-            f"{email[4]} {email[5]}",
+            f"{email[4]} {email[6]}",
             "%d-%m-%Y %H:%M"
         )
 
@@ -266,15 +268,15 @@ def calendar_events():
             "textColor": "#000000",
 
             "recipient": email[1],
-            "status": email[6],
-            "error": email[7]
+            "status": email[7],
+            "error": email[8]
         })
 
     # Sent Emails (Green)
     for email in sent:
 
         dt = datetime.strptime(
-            f"{email[4]} {email[5]}",
+            f"{email[4]} {email[6]}",
             "%d-%m-%Y %H:%M"
         )
 
@@ -286,15 +288,15 @@ def calendar_events():
             "borderColor": "#198754",
 
             "recipient": email[1],
-            "status": email[6],
-            "error": email[7]
+            "status": email[7],
+            "error": email[8]
         })
 
     # Failed Emails (Red)
     for email in failed:
 
         dt = datetime.strptime(
-            f"{email[4]} {email[5]}",
+            f"{email[4]} {email[6]}",
             "%d-%m-%Y %H:%M"
         )
 
@@ -306,8 +308,8 @@ def calendar_events():
             "borderColor": "#dc3545",
 
             "recipient": email[1],
-            "status": email[6],
-            "error": email[7]
+            "status": email[7],
+            "error": email[8]
         })
 
     return events

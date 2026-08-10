@@ -100,18 +100,6 @@ def create_next_recurring_email(
     next_time,
     next_occurrence_count
 ):
-    """
-    Creates the next recurring row.
-    `next_date` / `next_time` MUST already be the correctly
-    calculated next occurrence (current scheduled time + interval),
-    computed by the caller (scheduler). This function does not
-    do any date math itself.
-
-    `next_occurrence_count` carries forward how many times this
-    chain has now sent (including the one just sent), so the
-    scheduler can compare it against max_occurrences on the next
-    row too.
-    """
     
     conn = sqlite3.connect("emails.db")
     cursor = conn.cursor()
@@ -142,11 +130,11 @@ def create_next_recurring_email(
         email[2],      # subject
         email[3],      # message
         next_date,     # new date
-        email[9],      # end_date
+        email[5],      # end_date (was email[9] -- wrong column)
         next_time,     # new time
         "Pending",     # new status
         None,          # error
-        email[8],      # attachments
+        email[9],      # attachments (was email[8] -- wrong column)
         email[10],     # repeat_interval
         email[11],     # attach_document
         next_attachment_path,
@@ -245,24 +233,6 @@ def update_status(email_id, status, error=None):
     conn.close()
 
 def email_to_dict(email):
-
-    # 0 → id
-    # 1 → recipient
-    # 2 → subject
-    # 3 → message
-    # 4 → date
-    # 5 → time
-    # 6 → status
-    # 7 → error
-    # 8 → attachments
-    # 9 → end_date
-    # 10 → repeat_interval
-    # 11 → attach_document
-    # 12 → attachment_path
-    # 13 → attachment_filename
-    # 14 → attachment_status
-    # 15 → max_occurrences
-    # 16 → occurrence_count
 
     return {
         "id": email[0],
@@ -528,7 +498,8 @@ def create_smtp_table():
         smtp_host TEXT NOT NULL,
         smtp_port INTEGER NOT NULL,
         sender_email TEXT NOT NULL,
-        app_password TEXT NOT NULL
+        app_password TEXT NOT NULL,
+        created_at TEXT NOT NULL
     )
     """)
 
@@ -541,10 +512,6 @@ def save_smtp_settings(host, port, email, password):
     cursor = conn.cursor()
 
     encrypted_password = encrypt(password)
-
-    print("Original password:", password)
-    print("Encrypted password:", encrypted_password)
-
     created_at = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 
     cursor.execute("""
