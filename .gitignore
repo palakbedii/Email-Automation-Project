@@ -12,5 +12,10 @@ __pycache__/
 secret.key
 .env
 
-# Uploads
+# Generated reports
+BACKEND/Reports/*
+BACKEND/Archive/*
+
+# Uploaded files
+BACKEND/uploads/*
 uploads/

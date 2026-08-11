@@ -1,0 +1,83 @@
+# ======================================================
+# Email Automation System - Requirements
+# ======================================================
+
+# Installed using: pip install -r requirements.txt
+
+# ==========================
+# Web Frameworks
+# ==========================
+Flask==3.1.1
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+
+# ==========================
+# Data Validation
+# ==========================
+pydantic==2.11.7
+
+# ==========================
+# Security & Encryption
+# ==========================
+cryptography==45.0.6
+
+# ==========================
+# HTTP Requests (+ Prometheus API)
+# ==========================
+requests==2.32.4
+
+# ==========================
+# Environment Variables
+# ==========================
+python-dotenv==1.1.1
+
+# ==========================
+# File Upload Support
+# ==========================
+python-multipart==0.0.20
+
+# ==========================
+# CORS Support
+# ==========================
+starlette==0.47.2
+
+# ==========================
+# Date & Time Utilities (better date/time handling)
+# ==========================
+python-dateutil==2.9.0.post0
+
+# ==========================
+# Email Validation (if not using only Python's built-in smtplib)
+# ==========================
+email-validator==2.2.0
+
+# ==========================
+# Excel Report Generation
+# ==========================
+openpyxl
+
+# ==========================
+# Scheduling
+# ==========================
+APScheduler==3.11.0
+schedule
+
+# ==========================
+# Development & Auto Reload
+# ==========================
+watchfiles==1.1.0
+
+# ==========================
+# Template Engine
+# ==========================
+Jinja2==3.1.6
+
+# ==========================
+# Production Server
+# ==========================
+gunicorn==23.0.0
+
+# ==========================
+# Utility Libraries
+# ==========================
+Werkzeug==3.1.3

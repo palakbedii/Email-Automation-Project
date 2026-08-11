@@ -10,11 +10,9 @@ from database import (
     create_next_recurring_email
 )
 
-from attachment_manager import (
-    get_automatic_attachment,
-    resolve_next_attachment,
-    archive_file
-)
+from attachment_manager import archive_file
+
+from monitoring.monitoring_service import generate_monitoring_report
 
 from smtp import send_email
 
@@ -50,128 +48,223 @@ def scheduler():
             attachment_path = email[12]
             attachment_filename = email[13]
             attachment_status = email[14]
-            actual_attachment_path = None
-            next_attachment_before_archive = None
             max_occurrences = email[15]
             occurrence_count = email[16]
+            actual_attachment_path = None
 
             print("-------------------------")
+            print("Email ID :", email_id)
             print("Database Date :", date)
             print("Database Time :", scheduled_time)
-            scheduled_datetime = datetime.strptime(
-            date + " " + scheduled_time,
-                "%d-%m-%Y %H:%M"
-            )
+
+            try:
+                scheduled_datetime = datetime.strptime(
+                date + " " + scheduled_time,
+                    "%d-%m-%Y %H:%M"
+                )
+
+            except Exception as e:
+
+                print(
+                    "Invalid scheduled date/time:",
+                    e
+                )
+
+                update_status(
+                    email_id,
+                    "Failed",
+                    f"Invalid scheduled date/time: {str(e)}"
+                )
+
+                continue
             
-            if  current_datetime >= scheduled_datetime:
-                try:
+            if  current_datetime < scheduled_datetime:
+                continue
+            
+            try:
 
-                    # Automatic Report Attachment
-                    if attach_document:
+                # Automatic Report Attachment
+                if attach_document:
 
-                        if attachment_path:
-                            actual_attachment_path = BASE_DIR / attachment_path
+                    try:
 
-                        else:
-                            automatic_report = get_automatic_attachment()
-                            print("Automatic report:",automatic_report)
-
-                            if automatic_report:
-                                actual_attachment_path = automatic_report
-
-                        if actual_attachment_path:
-                            attachments.append(actual_attachment_path)
-                            print("Attachments being sent:", attachments)
-
-                    send_email(recipient, subject, message, attachments)
-                    update_status(email_id, "Sent", None)
-                    print("Email Sent Successfully")
-
-                    if attach_document and actual_attachment_path:
-                        next_attachment_before_archive = resolve_next_attachment(
-                            Path(actual_attachment_path).name
+                        print(
+                            "Generating new monitoring report..."
                         )
-                                
-                    if attach_document and actual_attachment_path:
+
+                        actual_attachment_path = (
+                            generate_monitoring_report()
+                        )
+
+                        print(
+                            "Generated monitoring report:",
+                            actual_attachment_path
+                        )
+
+                        if not actual_attachment_path:
+
+                            raise FileNotFoundError(
+                                "Monitoring report could not be generated."
+                            )
+
+                        actual_attachment_path = Path(
+                            actual_attachment_path
+                        )
+
+                        if not actual_attachment_path.exists():
+
+                            raise FileNotFoundError(
+                                f"Generated report does not exist: "
+                                f"{actual_attachment_path}"
+                            )
+
+                        attachments.append(
+                            actual_attachment_path
+                        )
+
+                        print(
+                            "Attachments being sent:",
+                            attachments
+                        )
+
+                    except Exception as e:
+
+                        print(
+                            "Monitoring report generation error:",
+                            e
+                        )
+
+                        update_status(
+                            email_id,
+                            "Failed",
+                            f"Monitoring Report Error: {str(e)}"
+                        )
+
+                        continue
+
+                # SEND EMAIL
+                send_email(
+                    recipient,
+                    subject,
+                    message,
+                    attachments
+                )
+
+                update_status(
+                    email_id,
+                    "Sent",
+                    None
+                )
+
+                print(
+                    "Email Sent Successfully"
+                )
+
+                # ARCHIVE AUTOMATIC REPORT
+                if (
+                    attach_document
+                    and actual_attachment_path
+                ):
+
+                    try:
+
                         update_attachment_details(
                             email_id,
                             str(actual_attachment_path),
-                            Path(actual_attachment_path).name,
-                            "Automatic" if not attachment_filename else attachment_status
+                            actual_attachment_path.name,
+                            "Automatic"
                         )
-                        archive_file(Path(actual_attachment_path))
 
-                    # RECURRING EMAIL LOGIC
-                    if repeat_interval and repeat_interval != "Never":
-                        try:
+                        archive_file(
+                            actual_attachment_path
+                        )
 
-                            # Check Max Occurrences   
-                            if max_occurrences and occurrence_count >= max_occurrences:
-                                print("Repeat stopped: Maximum occurrences reached")
-                                continue
+                        print(
+                            "Monitoring report archived:",
+                            actual_attachment_path.name
+                        )
 
-                            # Calculating next scheduled datetime     
-                            if repeat_interval == "Hourly":
-                                next_datetime = scheduled_datetime + timedelta(hours=1)
+                    except Exception as e:
 
-                            elif repeat_interval == "Daily":
-                                next_datetime = scheduled_datetime + timedelta(days=1)
+                        print(
+                            "Report archive error:",
+                            e
+                        )
 
-                            elif repeat_interval == "Weekly":
-                                next_datetime = scheduled_datetime + timedelta(weeks=1)
+                        # Email was already successfully sent.
+                        # Do NOT mark the email as Failed.
+                        print(
+                            "WARNING: Email was sent, "
+                            "but report archival failed."
+                        )
 
-                            else:
-                                continue
+                # RECURRING EMAIL LOGIC
+                if repeat_interval and repeat_interval != "Never":
 
-                            # Check End Date
-                            if end_date:
-                                end_datetime = datetime.strptime(
-                                    end_date + " 23:59",
-                                    "%d-%m-%Y %H:%M"
-                                )
+                    try:
 
-                                if next_datetime > end_datetime:
-                                    print("Repeat stopped: End date reached")
-                                    continue
-    
-                            # Create next pending email
-                            if next_attachment_before_archive:
-                                new_email_id = create_next_recurring_email(
-                                    email,
-                                    str(next_attachment_before_archive),
-                                    next_attachment_before_archive.name,
-                                    "Automatic",
-                                    next_datetime.strftime("%d-%m-%Y"),
-                                    next_datetime.strftime("%H:%M"),
-                                    occurrence_count + 1
-                                )
+                        # Check Max Occurrences   
+                        if max_occurrences and occurrence_count >= max_occurrences:
+                            print("Repeat stopped: Maximum occurrences reached")
+                            continue
 
-                            else:
-                                new_email_id = create_next_recurring_email(
-                                    email,
-                                    None,
-                                    None,
-                                    None,
-                                    next_datetime.strftime("%d-%m-%Y"),
-                                    next_datetime.strftime("%H:%M"),
-                                    occurrence_count + 1
-                                )
-                            print(
-                                "Next recurring email created. ID:",
-                                new_email_id
+                        # Calculating next occurrence   
+                        if repeat_interval == "Hourly":
+                            next_datetime = scheduled_datetime + timedelta(hours=1)
+
+                        elif repeat_interval == "Daily":
+                            next_datetime = scheduled_datetime + timedelta(days=1)
+
+                        elif repeat_interval == "Weekly":
+                            next_datetime = scheduled_datetime + timedelta(weeks=1)
+
+                        else:
+                            print("Unknown repeat interval:", repeat_interval)
+
+                            continue
+
+                        # Check End Date
+                        if end_date:
+                            end_datetime = datetime.strptime(
+                                end_date + " 23:59",
+                                "%d-%m-%Y %H:%M"
                             )
-                            print(email)
-                            print(new_email_id)
 
-                        except Exception as e:
-                            print("Recurring Creation Error (Scheduler Error):", e)
-                            update_status(email_id, "Failed", str(e))
+                            if next_datetime > end_datetime:
+                                print("Repeat stopped: End date reached")
 
-                except Exception as e:
+                                continue
+    
+                        # Create next email
+                        new_email_id = (
+                            create_next_recurring_email(
+                                email,
+                                None,
+                                None,
+                                None,
+                                next_datetime.strftime("%d-%m-%Y"),
+                                next_datetime.strftime("%H:%M"),
+                                occurrence_count + 1
+                            )
+                        )    
 
-                    print("SMTP Error:", e)
-                    update_status(email_id, "Failed", str(e))
-                    print("Email Sending Failed")
+                        print(
+                            "Next recurring email created. ID:",
+                            new_email_id
+                        )
+                        print(email)
+                        print(new_email_id)
+
+                    except Exception as e:
+
+                        print("Recurring Creation Error (Scheduler Error):", e)
+                        update_status(email_id, "Failed", f"Recurring Creation Error: {str(e)}" )
+
+            except Exception as e:
+
+                print("Email Sending Error:", e)
+                update_status(email_id, "Failed", str(e))
+                print("Email Sending Failed")
                 
         time.sleep(30)
 

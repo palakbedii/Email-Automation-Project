@@ -15,11 +15,11 @@ def create_email_table():
         subject TEXT,
         message TEXT,
         date TEXT,
-        end_date TEXT,
         time TEXT,
         status TEXT,
         error TEXT,
         attachments TEXT,
+        end_date TEXT,
         repeat_interval TEXT,
         attach_document INTEGER,
         attachment_path TEXT,
@@ -151,7 +151,7 @@ def create_next_recurring_email(
         email[11],     # attach_document
         next_attachment_path,
         next_attachment_filename,
-        next_attachment_status,
+        next_attachment_status, 
         email[15],     # max_occurrences
         next_occurrence_count
     ))

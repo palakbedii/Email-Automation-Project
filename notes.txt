@@ -1,6 +1,6 @@
-Email Scheduler/
+EMAIL_AUTOMATION_PROJECT/
 │
-├── frontend/                      ← Flask Application
+├── FRONTEND/                      ← Flask Application
 │   │
 │   ├── app.py
 │   │
@@ -11,76 +11,94 @@ Email Scheduler/
 │   │   │    ├── Navbar
 │   │   │    ├── Footer
 │   │   │    └── {% block content %}
+│   │   │
 │   │   ├── dashboard.html
 │   │   ├── email_templates.html
-│   │   ├── schedule.html
+│   │   ├── new_template.html
+│   │   ├── edit_template.html
+│   │   ├── compose.html
 │   │   ├── calendar.html
+│   │   ├── schedule.html
 │   │   ├── sent.html
 │   │   ├── failed.html
-│   │   └── smtp.html
+│   │   └── smtp_settings.html
 │   │
 │   ├── static/
 │   │   ├── css/
+│   │   │    │
+│   │   │    └── calendar.css
+│   │   │
 │   │   ├── js/
+│   │   │    │
+│   │   │    └── email_table.js
+│   │   │
+│   │   ├── assets/
 │   │   ├── images/
+│   │   ├── plugins/
 │   │   └── AdminLTE/
 │   │
-│   └── requirements.txt
+│   └── uploads/
 │
-├── backend/                       ← Your FastAPI Project (ZIP)
+│
+├── BACKEND/                       ← FastAPI
 │   │
 │   ├── app.py
+│   ├── attachments_manager.py
+│   ├── check_db.py
 │   ├── models.py
 │   ├── database.py
 │   ├── scheduler.py
-│   ├── email_sender.py
+│   ├── secret.py
+│   ├── security.py
+│   ├── smtp.py
+│   ├── templates_api.py
 │   ├── emails.db
-│   └── requirements.txt
+│   ├── templates.db
+│   ├── Archive/
+│   ├── Reports/
+│   └── monitoring/
+│       │
+│       ├── __init__.py
+│       ├── config.py                     ← Stores configuration only
+│       ├── metrics.py                    ← PromQL queries & calculations
+│       ├── prometheus_api.py             ← Communicates with Prometheus
+│       ├── monitoring_service.py         ← Main entry point
+│       └── report_generator.py           ← Creates Excel report
+│
+│
+├── prometheus/
+│      │
+│      ├── prometheus.exe
+│      ├── prometheus.yml
+│      └── console_libraries/
+│
+│
+├── .gitignore
+│
+│
+├── notes.txt
+│
 │
 ├── README.md
 │
-└── .gitignore
+│
+└── requirements.txt
 
 -----------------------------------------------------------------------------------------------------------
-frontend
-│
-├── app.py
-├── config.py
-├── requirements.txt
-│
-├── routes/
-│     auth.py
-│     dashboard.py
-│     emails.py
-│     templates.py
-│     smtp.py
-│
-├── services/
-│     api.py
-│
-├── templates/
-│
-├── static/
 
------------------------------------------------------------------------------------------------------------
 PROJECT PORTFOLIO
 
-🏠 Dashboard (email statistics)
-📝 Email Templates (create/edit templates)
-📅 Schedule Mail (compose and schedule emails)
-📆 Scheduled Calendar (calendar view of pending emails)
-✅ Sent Emails (history with search/filter)
-❌ Failed Emails (retry failed sends)
-⚙️ SMTP Settings (configure sender account)
-🚪 Logout
+Login (authentication and session handling)
+Dashboard (email statistics + cards with live counts from FastAPI)
+Email Templates (CRUD operations on templates)
+Compose Mail (compose and schedule emails including template selection and attachments)
+Scheduled Calendar (calendar view of Scheduled, Sent, and Failed Emails)
+Scheduled Email page
+Sent Email page
+Failed Email page
+SMTP Settings (configure sender account)
+Logout
 
-OR :
-Login (authentication and session handling).
-AdminLTE layout (navbar, sidebar, footer, routing).
-Dashboard (cards with live counts from FastAPI).
-Email Templates (CRUD operations).
-Compose/Schedule Mail (including template selection and attachments).
-Scheduled, Sent, and Failed Email pages.
-Calendar (show scheduled emails visually).
-SMTP Settings.
-Polish (loading spinner, alerts, animations, search, pagination, responsive design).
+# Polish (history with search/filter, retry failed sends, loading spinner, alerts, animations, search, pagination, responsive design).
+
+-----------------------------------------------------------------------------------------------------------
