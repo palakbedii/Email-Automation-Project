@@ -1344,9 +1344,9 @@ are associated with the project's security implementation and should be handled 
 
 # 📷 Screenshots
 
-Screenshots can be added to the repository using a dedicated `screenshots/` directory.
+Screenshots will be added to the repository using a dedicated `screenshots/` directory.
 
-Recommended screenshots:
+Screenshots:
 
 ```text
 screenshots/
@@ -1411,9 +1411,9 @@ Example:
 
 # 👩‍💻 Author
 
-**Olive**
+**Palak Bedi**
 
-Computer Science Engineering Student
+Computer Science Engineering Undergrad'28
 
 Industrial Internship Project
 **Centre for Development of Telematics (C-DOT)**
