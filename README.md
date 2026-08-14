@@ -541,49 +541,7 @@ The purpose of this handling is to prevent invalid monitoring data from being si
 
 The project follows a two-layer web application architecture.
 
-```text
-                    ┌──────────────────┐
-                    │      User        │
-                    │     Browser      │
-                    └────────┬─────────┘
-                             │
-                             ▼
-                    ┌──────────────────┐
-                    │     Flask        │
-                    │    Frontend      │
-                    └────────┬─────────┘
-                             │
-                             │ REST API
-                             ▼
-                    ┌──────────────────┐
-                    │     FastAPI      │
-                    │     Backend      │
-                    └───────┬──────────┘
-                            │
-             ┌──────────────┼──────────────┐
-             │              │              │
-             ▼              ▼              ▼
-        ┌────────┐    ┌───────────┐   ┌──────────┐
-        │ SQLite │    │ Scheduler │   │   SMTP   │
-        │Database│    │           │   │  Gmail   │
-        └────────┘    └─────┬─────┘   └──────────┘
-                            │
-                            ▼
-                    ┌─────────────────┐
-                    │   Monitoring    │
-                    │    Service      │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │   Prometheus    │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Windows Exporter│
-                    └─────────────────┘
-```
+<img width="1410" height="1947" alt="mermaid-diagram" src="https://github.com/user-attachments/assets/0d716d87-e224-4c56-9d4d-1aa5ee9e1d81" />
 
 ---
 
